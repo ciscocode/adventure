@@ -1,0 +1,89 @@
+/*
+ * File: AdvObject.js
+ * ------------------
+ * This file defines a class that models an object in Adventure.
+ * Each object is characterized by the following properties:
+ *
+ * - The object name, which is the noun used to refer to the object
+ * - The object description, which is a one-line string
+ * - The name of the room in which the object initially lives
+ *
+ * The XML format for an object is described in the assignment.
+ */
+
+"use strict";
+
+// The definition of the AdvObject class includes the header lines
+// of the methods you need to implement, but not the actual code.
+// You need to fill the definitions in as part of Milestone #4.
+
+/*
+ * Factory method: AdvObject
+ * Usage: let obj = AdvObject(name, description, location);
+ * --------------------------------------------------------
+ * Creates an AdvObject from the specified properties.
+ */
+
+function AdvObject(name, description, location) {
+
+   let obj = { };
+
+/*
+ * Method: getName
+ * Usage: let name = obj.getName();
+ * --------------------------------
+ * Returns the name of this object.
+ */
+
+   obj.getName = function() {
+      // You write this method
+   };
+
+/*
+ * Method: getDescription
+ * Usage: let description = obj.getDescription();
+ * ----------------------------------------------
+ * Returns the description of this object.
+ */
+
+   obj.getDescription = function() {
+      // You write this method
+   };
+
+/*
+ * Method: getLocation
+ * Usage: let roomName = obj.getLocation();
+ * ----------------------------------------
+ * Returns the name of the room in which this object initially lives.
+ */
+
+   obj.getLocation = function() {
+      // You write this method
+   };
+
+/*
+ * Method: toString
+ * Usage: (usually called implicitly)
+ * ----------------------------------
+ * Returns the string form of the AdvObject.
+ */
+
+   obj.toString = function() {
+      return "<AdvObject:" + name + ">";
+   };
+
+   return obj;
+
+}
+
+/*
+ * Function: readObjects
+ * Usage: let objects = readObjects(gameXML);
+ * ------------------------------------------
+ * Creates a map from object names to objects by reading the XML data
+ * from the <object> tags.
+ */
+
+function readObjects(gameXML) {
+   // You fill in the code
+}
