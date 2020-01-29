@@ -35,7 +35,7 @@ function AdvPassage(direction, room, key) {
 
    passage.getDirection = function() {
       return direction;
-   }
+   };
 
 /*
  * Method: getDestinationRoom
@@ -46,7 +46,7 @@ function AdvPassage(direction, room, key) {
 
    passage.getDestinationRoom = function() {
       return room;
-   }
+   };
 
 /*
  * Method: getKey
@@ -58,7 +58,7 @@ function AdvPassage(direction, room, key) {
 
    passage.getKey = function() {
       return key;
-   }
+   };
 
    return passage;
 

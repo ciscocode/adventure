@@ -17,7 +17,7 @@
 
 function AdvGame() {
    let element = document.getElementById("GameData");
-   if (element === undefined) return undefined;
+   if (element === null) return undefined;
 
    // You write the code that initializes the state of the game
 

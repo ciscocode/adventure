@@ -164,16 +164,61 @@ function AdvRoom(name, shortDescription, longDescription, passages) {
 
 /*
  * Function: readRooms
- * Usage: let rooms = readRooms(gameXML);
- * --------------------------------------
+ * Usage: let rooms = readRooms();
+ * -------------------------------
  * Creates a map for the rooms by reading all the room tags from the
  * XML data for the game.  The keys in the map are the room names,
  * and the values are the AdvRoom objects that contain the data for
  * the corresponding room.  To ensure that the game starts with the
  * first room in the XML data, the map also stores a reference to the
  * first room under the name "START".
+ *
+ * Your implementation will benefit **greatly** from using the
+ * getLongDescription function supplied below.
  */
 
-function readRooms(gameXML) {
+function readRooms() {
    // You fill this in as part of Milestone #1
+}
+
+/*
+ * Function: getLongDescription
+ * ----------------------------
+ * This is a convenience function that can be used to extract
+ * all of the visible lines of room.innerHTML and return them
+ * in an array.  So, if the roomXML looks like this:
+ *
+ *   <room name="OutsideBuilding" short="Outside building">
+ *     You are standing at the end of a road before a small brick
+ *     building.  A small stream flows out of the building and
+ *     down a gully to the south.  A road runs up a small hill
+ *     to the west.
+ *     <passage dir="WEST" room="EndOfRoad" />
+ *     <passage dir="UP" room="EndOfRoad" />
+ *     <passage dir="NORTH" room="InsideBuilding" />
+ *     <passage dir="IN" room="InsideBuilding" />
+ *     <passage dir="SOUTH" room="Valley" />
+ *     <passage dir="DOWN" room="Valley" />
+ *   </room>
+ * 
+ * then getLongDescription(roomXML) would return an array of length
+ * 4 that looks like this:
+ *
+ *   ["You are standing at the end of a road before a small brick",
+ *    "building.  A small stream flows out of the building and",
+ *    "down a gully to the south.  A road runs up a small hill",
+ *    "to the west."]
+ *
+ * One can then iterate over this array and use console.log to print each line.
+ */
+function getLongDescription(roomXML) {
+	let lines = [];
+	let raw = roomXML.innerHTML.split("\n");
+	while (raw.length > 0) {
+		let line = raw.shift().trim();
+		if (line.length > 0 && !line.startsWith("<")) {
+			lines.push(line);
+		}
+	}
+	return lines;
 }

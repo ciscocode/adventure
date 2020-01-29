@@ -78,12 +78,12 @@ function AdvObject(name, description, location) {
 
 /*
  * Function: readObjects
- * Usage: let objects = readObjects(gameXML);
- * ------------------------------------------
+ * Usage: let objects = readObjects();
+ * ----------------------------------
  * Creates a map from object names to objects by reading the XML data
  * from the <object> tags.
  */
 
-function readObjects(gameXML) {
+function readObjects() {
    // You fill in the code
 }

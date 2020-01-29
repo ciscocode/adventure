@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Adventure!</title>
+    <script type="text/javascript"
+            src="http://cs106aj.stanford.edu/jslib/JSConsole.js"></script>
+    <script type="text/javascript" src="TeachingMachine.js"></script>
+	 <script type="text/javascript" src="TMCourse.js"></script>
+	 <script type="text/javascript" src="TMQuestion.js"></script>
+  </head>
+  <body onload="TeachingMachine()">
+    <div id="JSConsole" width=800 height=600></div>
+    <div style="display:none;">
+      <question id="OutsideBuilding">
+        You are standing at the end of a road before a
+        small brick building.  A small stream flows out
+        of the building and down a gully to the south.
+        A road runs up a small hill to the west.
+        <answer response="south" nextQuestion="Valley" />
+        <answer response="s" nextQuestion="Valley" />
+        <answer response="north" nextQuestion="InsideBuilding" />
+        <answer response="n" nextQuestion="InsideBuilding" />
+        <answer response="in" nextQuestion="InsideBuilding" />
+        <answer response="west" nextQuestion="EndOfRoad" />
+        <answer response="w" nextQuestion="EndOfRoad" />
+        <answer response="quit" nextQuestion="EXIT" />
+        <answer response="q" nextQuestion="EXIT" />
+      </question>
+      <question id="Valley">
+        You are in a valley in the forest beside a stream
+        tumbling along a rocky bed.  The stream is flowing
+        to the south.
+        <answer response="south" nextQuestion="SlitInRock" />
+        <answer response="s" nextQuestion="SlitInRock" />
+        <answer response="down" nextQuestion="SlitInRock" />
+        <answer response="d" nextQuestion="SlitInRock" />
+        <answer response="north" nextQuestion="OutsideBuilding" />
+        <answer response="n" nextQuestion="OutsideBuilding" />
+        <answer response="quit" nextQuestion="EXIT" />
+        <answer response="q" nextQuestion="EXIT" />
+      </question>
+      <question id="SlitInRock">
+        At your feet all the water of the stream splashes
+        down a two-inch slit in the rock.  To the south,
+        the streambed is bare rock.
+        <answer response="north" nextQuestion="Valley" />
+        <answer response="n" nextQuestion="Valley" />
+        <answer response="south" nextQuestion="OutsideGrate" />
+        <answer response="s" nextQuestion="OutsideGrate" />
+        <answer response="down" nextQuestion="OutsideGrate" />
+        <answer response="quit" nextQuestion="EXIT" />
+        <answer response="q" nextQuestion="EXIT" />
+      </question>
+      <question id="OutsideGrate">
+        You are in a 20-foot depression floored with bare
+        dirt.  Set into the dirt is a strong steel grate
+        mounted in concrete.  A dry streambed leads into
+        the depression from the north.
+        The grate is open.
+        <answer response="north" nextQuestion="SlitInRock" />
+        <answer response="n" nextQuestion="SlitInRock" />
+        <answer response="up" nextQuestion="SlitInRock" />
+        <answer response="u" nextQuestion="SlitInRock" />
+        <answer response="down" nextQuestion="BeneathGrate" />
+        <answer response="d" nextQuestion="BeneathGrate" />
+        <answer response="quit" nextQuestion="EXIT" />
+        <answer response="q" nextQuestion="EXIT" />
+      </question>
+      <question id="BeneathGrate">
+        You are in a small chamber beneath a 3x3 steel grate
+        to the surface.  A low crawl leads over cobbles to
+        the west.
+        The grate is open.
+        <answer response="west" nextQuestion="CobbleCrawl" />
+        <answer response="w" nextQuestion="CobbleCrawl" />
+        <answer response="up" nextQuestion="OutsideGrate" />
+        <answer response="u" nextQuestion="OutsideGrate" />
+        <answer response="quit" nextQuestion="EXIT" />
+        <answer response="q" nextQuestion="EXIT" />
+      </question>
+      <question id="CobbleCrawl">
+        You are crawling over cobbles into a low east/west
+        passage.  There is a dim light to the east.
+        <answer response="east" nextQuestion="BeneathGrate" />
+        <answer response="e" nextQuestion="BeneathGrate" />
+        <answer response="west" nextQuestion="Darkness" />
+        <answer response="w" nextQuestion="Darkness" />
+        <answer response="quit" nextQuestion="EXIT" />
+        <answer response="q" nextQuestion="EXIT" />
+      </question>
+      <question id="Darkness">
+        It is now pitch dark.  If you proceed you will likely
+        fall into a pit.
+        <answer response="east" nextQuestion="CobbleCrawl" />
+        <answer response="e" nextQuestion="CobbleCrawl" />
+        <answer response="xyzzy" nextQuestion="InsideBuilding" />
+        <answer response="west" nextQuestion="EXIT" />
+        <answer response="w" nextQuestion="EXIT" />
+        <answer response="quit" nextQuestion="EXIT" />
+        <answer response="q" nextQuestion="EXIT" />
+     </question>
+     <question id="InsideBuilding">
+        You are inside a building, a well house for a large
+        spring.
+        <answer response="out" nextQuestion="OutsideBuilding" />
+        <answer response="south" nextQuestion="OutsideBuilding" />
+        <answer response="s" nextQuestion="OutsideBuilding" />
+        <answer response="xyzzy" nextQuestion="Darkness" />
+        <answer response="quit" nextQuestion="EXIT" />
+        <answer response="q" nextQuestion="EXIT" />
+      </question>
+      <question id="EndOfRoad">
+        You are on a road at the top of a small hill.  You
+        can see a small brick building at the end of the road
+        to the east.
+      <answer response="east" nextQuestion="OutsideBuilding" />
+      <answer response="e" nextQuestion="OutsideBuilding" />
+      <answer response="quit" nextQuestion="EXIT" />
+      <answer response="q" nextQuestion="EXIT" />
+    </div>
+  </body>
+</html>
