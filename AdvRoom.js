@@ -37,9 +37,18 @@ function AdvRoom(name, shortDescription, longDescription, passages) {
  * Returns the name of the room.
  */
 
-   room.getName = function() {
-      // You fill this in as part of Milestone #1
-   };
+
+room.getName = function(name) {
+   // You fill this in as part of Milestone #1
+   let match = passages[name.toLowerCase()];
+   if (match === undefined) match = name["*"];
+	return match;
+};
+
+//prints description initially
+/*room.printDescription = function() {
+   console.write(longDescription + "<br/>");
+};*/
 
 /*
  * Method: printShortDescription
@@ -63,6 +72,8 @@ function AdvRoom(name, shortDescription, longDescription, passages) {
 
    room.printLongDescription = function() {
       // You fill this in as part of Milestone #1
+      for (let i = 0; i<longDescription.length; i++)
+         console.write(longDescription[i] + "<br/>");
    };
 
 /*
@@ -78,6 +89,16 @@ function AdvRoom(name, shortDescription, longDescription, passages) {
       // You fill this in as part of Milestone #1
       // In Milestone #7, you will move this method to AdvGame.js and
       // replace it with a getPassages method
+
+      let passages = { };
+      let elements = dir.getElementsByTagName("passage");
+      for (let i = 0; i < elements.length; i++) {
+         let passageXML = elements[i];
+         let direction = passageXML.getAttribute("dir");
+         let nextRoom = passageXML.getAttribute("room");
+         passages[direction.toLowerCase()] = nextRoom;
+      }
+      return passages;
    };
 
 /*
@@ -179,6 +200,32 @@ function AdvRoom(name, shortDescription, longDescription, passages) {
 
 function readRooms() {
    // You fill this in as part of Milestone #1
+   let elements = document.getElementsByTagName("room");
+   if (elements.length === 0) return undefined;
+   let rooms = {};
+   for (let i = 0; i < elements.length; i++) {
+      let roomXML = elements[i];
+      let name = roomXML.getAttribute("name");
+      let room = roomXML.innerHTML;
+      let shortDescription = roomXML.getAttribute("short");
+      let passages = readPassages(roomXML);
+      let longDescription = getLongDescription(roomXML)
+      rooms[name] = AdvRoom(name, shortDescription, longDescription, passages)
+      if (i === 0) rooms["START"] = rooms[name];
+   }
+   return rooms;
+}
+
+function readPassages(roomXML) {
+   let passages = { };
+   let elements = roomXML.getElementsByTagName("passage");
+   for (let i = 0; i < elements.length; i++) {
+      let passageXML = elements[i];
+      let direction = passageXML.getAttribute("dir");
+      let nextRoom = passageXML.getAttribute("room");
+      passages[direction.toLowerCase()] = nextRoom;
+   }
+   return passages;
 }
 
 /*

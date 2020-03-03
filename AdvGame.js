@@ -16,12 +16,39 @@
  */
 
 function AdvGame() {
+   let rooms = readRooms()
+   //console.log(rooms)
    let element = document.getElementById("GameData");
+   //console.log(element)
    if (element === null) return undefined;
 
    // You write the code that initializes the state of the game
+   let currentRoom = rooms["START"];
+   //console.log(element)
+   //console.log(currentRoom); erase you dont need this anymore!
+	
+	function describeRoom() {
+	   currentRoom.printLongDescription();
+	   console.requestInput("> ", checkAnswer);
+	}
+
+   function checkAnswer(line) {
+
+      //console.log(currentRoom); erase unless you need it later!!
+
+      let roomName = currentRoom.getName(line);
+     	if (roomName === "EXIT") return;
+     	if (roomName === undefined) {
+         console.log("I don't understand that response.");
+      } else {
+         currentRoom = rooms[roomName];
+      }
+      describeRoom();
+   }
+	
 
    let game = { };
+   
 
 /*
  * Method: play
@@ -31,7 +58,7 @@ function AdvGame() {
  */
 
    game.play = function() {
-      // You fill in the code for the play method
+      describeRoom()
    };
 
    return game;
