@@ -28,8 +28,16 @@ function AdvGame() {
    //console.log(currentRoom); erase you dont need this anymore!
 	
 	function describeRoom() {
-	   currentRoom.printLongDescription();
-	   console.requestInput("> ", checkAnswer);
+      if (currentRoom.hasBeenVisited()) { //after you visit a room once the game should only print the short description the next time you visit
+         currentRoom.printShortDescription()
+      }
+
+      else {
+         currentRoom.printLongDescription();
+      }
+      currentRoom.setVisited(true) //set flag as true. after visiting the room tell the room it has been visited. If not, it will always print the long description.  
+      console.requestInput("> ", checkAnswer);
+      
 	}
 
    function checkAnswer(line) {

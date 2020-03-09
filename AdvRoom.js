@@ -60,6 +60,7 @@ room.getName = function(name) {
 
    room.printShortDescription = function() {
       // You fill this in as part of Milestone #2
+      console.write(shortDescription + "<br/>");
    };
 
 /*
@@ -109,8 +110,13 @@ room.getName = function(name) {
  * visited.  The Boolean argument flag must be either true or false.
  */
 
+   let flagVisited; //create a variable that tells you whether or not a room has been visited
+
    room.setVisited = function(flag) {
       // You fill this in as part of Milestone #2
+      //set the parameter (which will be true) when you call the function to flagvisited
+      flagVisited = flag 
+
    };
 
 /*
@@ -122,6 +128,7 @@ room.getName = function(name) {
 
    room.hasBeenVisited = function() {
       // You fill this in as part of Milestone #2
+      return flagVisited
    };
 
 /*
