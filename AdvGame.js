@@ -17,14 +17,11 @@
 
 function AdvGame() {
    let rooms = readRooms()
-   //console.log(rooms)
    let element = document.getElementById("GameData");
-   //console.log(element)
    if (element === null) return undefined;
 
    // You write the code that initializes the state of the game
    let currentRoom = rooms["START"];
-   //console.log(element)
    //console.log(currentRoom); erase you dont need this anymore!
 	
 	function describeRoom() {
@@ -36,22 +33,64 @@ function AdvGame() {
          currentRoom.printLongDescription();
       }
       currentRoom.setVisited(true) //set flag as true. after visiting the room tell the room it has been visited. If not, it will always print the long description.  
+     // console.log('requesting input');
       console.requestInput("> ", checkAnswer);
       
-	}
-
+   }
+   
    function checkAnswer(line) {
-
+      //console.log('checking answer');
       //console.log(currentRoom); erase unless you need it later!!
 
+      //let actionVerbs = ["quit","help","look"]
+      //console.log("this is line " + line)
+      //console.log("this is currentRoom " + currentRoom)
+
+      line = line.toLowerCase()
+
+      switch (line) {
+         case "look":
+            currentRoom.printLongDescription();
+            break;
+   
+         case "help":
+            printHelp();
+            break;
+            
+         case "quit":
+            return
+            break;
+
+      }
+            let roomName = currentRoom.getName(line);
+            if (roomName === undefined) {
+                console.log("I don't understand that response.");
+             } else {
+                currentRoom = rooms[roomName];
+             }
+             describeRoom();
+   
+      
+      //old version is below
+
+      /*if (line === "look") {
+         currentRoom.printLongDescription();
+         return
+      }
+      if (line === "help") {
+         printHelp();
+         return
+      }
+      if (line === "quit") return; // do i need this?
+      
       let roomName = currentRoom.getName(line);
-     	if (roomName === "EXIT") return;
      	if (roomName === undefined) {
          console.log("I don't understand that response.");
       } else {
          currentRoom = rooms[roomName];
       }
-      describeRoom();
+      describeRoom(); */
+   
    }
 	
 
@@ -98,3 +137,9 @@ const HELP_TEXT = [
    "To reprint the detailed description of where you are, say LOOK.  If you",
    "want to end your adventure, say QUIT."
 ];
+
+function printHelp() {
+   // this function loops so that every sentance in HELP_TEXT array is printed out neatly without commas breaking up every phrase
+   for (let i = 0; i<HELP_TEXT.length; i++)
+      console.write(HELP_TEXT[i] + "<br/>");
+};
