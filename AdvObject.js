@@ -37,9 +37,7 @@ function AdvObject(name, description, location) {
 
    obj.getName = function(name) {
       // You write this method
-      let match = objects[name.toLowerCase()];
-      if (match === undefined) match = name["*"];
-      return match;
+      return name
    };
 
 /*
@@ -49,9 +47,8 @@ function AdvObject(name, description, location) {
  * Returns the description of this object.
  */
 
-   obj.getDescription = function(objectXML) {
+   obj.getDescription = function() {
       // You write this method
-      let description = objectXML.innerHTML
       return description
 
    };
@@ -63,9 +60,8 @@ function AdvObject(name, description, location) {
  * Returns the name of the room in which this object initially lives.
  */
 
-   obj.getLocation = function(objectXML) {
+   obj.getLocation = function() {
       // You write this method
-      let location = objectXML.getAttribute("location");
       return location
    };
 
@@ -100,12 +96,14 @@ function readObjects() {
    for (let i = 0; i < elements.length; i++) {
       let objectXML = elements[i];
       let name = objectXML.getAttribute("name");
-      let object = objectXML.innerHTML; //do I need this?
+      //let object = objectXML.innerHTML; //do I need this?
       let location = objectXML.getAttribute("location");
-      //let passages = readPassages(objectXML);
-      let description = getDescription(objectXML)
+      let description = getObjectDescription(objectXML)
       objects[name] = AdvObject(name, description, location)
-      //if (i === 0) rooms["START"] = rooms[name];
    }
    return objects;
+}
+
+function getObjectDescription(objectXML) {
+   return objectXML.innerHTML
 }

@@ -29,6 +29,7 @@
 function AdvRoom(name, shortDescription, longDescription, passages) {
 
    let room = { };
+   let objectArray = []; //this is an Array of AdvObject values
 
 /*
  * Method: getName
@@ -140,6 +141,9 @@ room.getName = function(name) {
 
    room.describeObjects = function() {
       // You fill this in as part of Milestone #4
+      for (let i=0; objectArray.length; i++) {
+         console.write("There is " + objectArray[i] + "here." + "<br/>");
+      }
    };
 
 /*
@@ -151,6 +155,7 @@ room.getName = function(name) {
 
    room.addObject = function(obj) {
       // You fill this in as part of Milestone #4
+      objectArray.push(obj)
    };
 
 /*
@@ -162,6 +167,12 @@ room.getName = function(name) {
 
    room.removeObject = function(obj) {
       // You fill this in as part of Milestone #4
+      //refactor to use filter. Splice mutates the array. 
+      for (let i=0; i<objectArray.length; i++) {
+         if (objectArray[i] === obj) { 
+            objectArray.splice(i,1)
+         }
+      }
    };
 
 /*
@@ -173,6 +184,14 @@ room.getName = function(name) {
 
    room.contains = function(obj) {
       // You fill this in as part of Milestone #4
+      for (let i=0; i<objectArray.length; i++) {
+         if (obj === objectArray[i]) {
+            return true
+         }
+         else {
+            return false
+         }
+      }
    };
 
 /*
@@ -213,7 +232,7 @@ function readRooms() {
    for (let i = 0; i < elements.length; i++) {
       let roomXML = elements[i];
       let name = roomXML.getAttribute("name");
-      let room = roomXML.innerHTML;
+      let room = roomXML.innerHTML; //do I need this?
       let shortDescription = roomXML.getAttribute("short");
       let passages = readPassages(roomXML);
       let longDescription = getLongDescription(roomXML)
