@@ -30,6 +30,8 @@ function AdvRoom(name, shortDescription, longDescription, passages) {
 
    let room = { };
    let objectArray = []; //this is an Array of AdvObject values
+   room.objectArray = objectArray //add the array as a propery 
+   //console.log(objectArray)
 
 /*
  * Method: getName
@@ -141,8 +143,8 @@ room.getName = function(name) {
 
    room.describeObjects = function() {
       // You fill this in as part of Milestone #4
-      for (let i=0; objectArray.length; i++) {
-         console.write("There is " + objectArray[i] + "here." + "<br/>");
+      for (let i=0; i<objectArray.length; i++) {
+         console.write("There is " + objectArray[i].getDescription() + "here." + "<br/>");
       }
    };
 
@@ -232,7 +234,7 @@ function readRooms() {
    for (let i = 0; i < elements.length; i++) {
       let roomXML = elements[i];
       let name = roomXML.getAttribute("name");
-      let room = roomXML.innerHTML; //do I need this?
+      //let room = roomXML.innerHTML; //do I need this?
       let shortDescription = roomXML.getAttribute("short");
       let passages = readPassages(roomXML);
       let longDescription = getLongDescription(roomXML)

@@ -15,16 +15,42 @@
  * in the index.html file.
  */
 
+function distributeObjects(objects,rooms) {
+   //use a for loop.. loop through the objects
+   //first read the post it and the location name
+   // then push the object into the room when location matches room name //!! PLAYER is not a room!
+
+   let numOfObjects = Object.keys(objects).length 
+   let arrayOfObjects = Object.values(objects)
+   let arrayOfRoomNames = Object.keys(rooms)
+   let arrayOfRoomObjects = Object.values(rooms)
+
+   for (let i=0; i<numOfObjects; i++) {
+      let locationsOfObjects = arrayOfObjects[i].getLocation() //this takes the location from an object at an index
+      for (let j=0; j<arrayOfRoomNames.length; j++) {
+         let nameOfRoom = arrayOfRoomNames[j]
+         //console.log(rooms.nameOfRoom)
+
+         if (locationsOfObjects === nameOfRoom) {
+            //let test = rooms.nameOfRoom
+            arrayOfRoomObjects[j].addObject(arrayOfObjects[i])
+            //rooms.nameOfRoom.addObject(arrayOfObjects[i])
+         }
+      }
+   }   
+}
+
 function AdvGame() {
    let rooms = readRooms()
+   let objects = readObjects()
+  distributeObjects(objects,rooms)
    let element = document.getElementById("GameData");
    if (element === null) return undefined;
 
    // You write the code that initializes the state of the game
-   let currentRoom = rooms["START"];
-   //console.log(currentRoom); erase you dont need this anymore!
-	
+   let currentRoom = rooms["START"];	
 	function describeRoom() {
+
       if (currentRoom.hasBeenVisited()) { //after you visit a room once the game should only print the short description the next time you visit
          currentRoom.printShortDescription()
       }
@@ -33,7 +59,7 @@ function AdvGame() {
          currentRoom.printLongDescription();
       }
       currentRoom.setVisited(true) //set flag as true. after visiting the room tell the room it has been visited. If not, it will always print the long description.  
-     // console.log('requesting input');
+      currentRoom.describeObjects()
       console.requestInput("> ", checkAnswer);
       
    }
