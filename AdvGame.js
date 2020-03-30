@@ -15,38 +15,26 @@
  * in the index.html file.
  */
 
- //this function distributes objects/items into their respective rooms in the game
-function distributeObjects(objects,rooms) {
-   //use a for loop.. loop through the objects
-   //first read the post it and the location name
-   // then push the object into the room when location matches room name //!! PLAYER is not a room!
+//this function distributes objects/items into their respective rooms in the game
 
-   let numOfObjects = Object.keys(objects).length 
-   let arrayOfObjects = Object.values(objects)
-   let arrayOfRoomNames = Object.keys(rooms)
-   let arrayOfRoomObjects = Object.values(rooms)
-
-   for (let i=0; i<numOfObjects; i++) {
-      let locationsOfObjects = arrayOfObjects[i].getLocation() //this takes the location from an object at an index
-      for (let j=0; j<arrayOfRoomNames.length; j++) {
-         let nameOfRoom = arrayOfRoomNames[j]
-
-         if (locationsOfObjects === nameOfRoom) {
-            arrayOfRoomObjects[j].addObject(arrayOfObjects[i])
-         }
-      }
-   }   
-}
 
 function AdvGame() {
+
+   //begin by reading xml/html data to create the rooms, objects, and synonyms necessary to play the game
    let rooms = readRooms()
    let objects = readObjects()
-  distributeObjects(objects,rooms)
+   let synonyms = readSynonyms()
+
+   //distirbute objects into their respective rooms
+   distributeObjects(objects,rooms)
+
    let element = document.getElementById("GameData");
    if (element === null) return undefined;
 
    // You write the code that initializes the state of the game
-   let currentRoom = rooms["START"];	
+   let currentRoom = rooms["START"];
+      
+   //this function describes a room when you visit it
 	function describeRoom() {
 
       if (currentRoom.hasBeenVisited()) { //after you visit a room once the game should only print the short description the next time you visit
@@ -67,10 +55,10 @@ function AdvGame() {
       let actionVerbs = ["quit","help","look"] //this is a list of actionverbs
       let actionVerbBoolean = false // begin as false. if we happen to identify a word as an actionVerb then we can make this true
       
-      //the following 3 lines are to ensure that the users input is subdivided into seperate words and that the first word is checked to be an action verb
-      line = line.split(" ")
-      line = line[0]
-      line = line.toLowerCase()
+      line = line.toLowerCase() //made the input line lowercase
+      line = line.split(" ") //if multiple words are entered split them into an array
+      checkSynonyms(line) //check for synonyms first
+      line = line[0] //input the first word
 
       //run this look to check if the word you used is in fact an action word
       for (let i=0; i<actionVerbs.length; i++) {
@@ -112,7 +100,28 @@ function AdvGame() {
 
       }
    }
-	
+
+   //this functions checks your input to see if it has a synonym. if there is a synonym it replaces your input with the definition
+   function checkSynonyms(line) {
+      let arrayOfSynonyms = Object.keys(synonyms)
+      let arrayOfSynonymsLowerCase = []
+      let arrayOfSynonymObjects = Object.values(synonyms)
+
+      //this loop creates an array that has the synonyms in lower case
+      for (let i=0; i<arrayOfSynonyms.length; i++) {
+        arrayOfSynonymsLowerCase[i] = arrayOfSynonyms[i].toLowerCase()
+      }
+
+      //this loop checks every word input in the line to see if it is a synonym
+      for (let i=0; i<line.length; i++) {
+         for (let j=0; j<arrayOfSynonyms.length; j++) {
+            if (line[i] === arrayOfSynonymsLowerCase[j]) { // if the a word in the input matches a synonym
+               line[i] = arrayOfSynonymObjects[j].getDefinition() // then replace the value of the input line with the definition of the synonym
+               line[i] = line[i].toLowerCase() //this brings the word back to lowercase after it has been shifted to capital with the synonym change
+            }
+         } 
+      }
+   }
 
    let game = { };
    
@@ -129,6 +138,59 @@ function AdvGame() {
    };
 
    return game;
+}
+
+function distributeObjects(objects,rooms) {
+   //use a for loop.. loop through the objects
+   //first read the post it and the location name
+   // then push the object into the room when location matches room name //!! PLAYER is not a room!
+
+   let numOfObjects = Object.keys(objects).length 
+   let arrayOfObjects = Object.values(objects)
+   let arrayOfRoomNames = Object.keys(rooms)
+   let arrayOfRoomObjects = Object.values(rooms)
+
+   for (let i=0; i<numOfObjects; i++) {
+      let locationsOfObjects = arrayOfObjects[i].getLocation() //this takes the location from an object at an index
+      for (let j=0; j<arrayOfRoomNames.length; j++) {
+         let nameOfRoom = arrayOfRoomNames[j]
+
+         if (locationsOfObjects === nameOfRoom) {
+            arrayOfRoomObjects[j].addObject(arrayOfObjects[i])
+         }
+      }
+   }   
+}
+
+//tbis function creates a synonym object 
+function AdvSynonym(word, definition) {
+   let synonymObject = { };
+
+   synonymObject.getWord = function(word) {
+      return word
+   };
+   synonymObject.getDefinition = function() {
+      return definition
+   };
+   synonymObject.toString = function() {
+      return "<AdvObject:" + word + ">";
+   };
+
+   return synonymObject;
+}
+
+// Creates a map from synonyms by reading the XML data from the <synonym> tags.
+function readSynonyms() {
+   let elements = document.getElementsByTagName("synonym");
+   if (elements.length === 0) return undefined;
+   let synonymObjects = {};
+   for (let i = 0; i < elements.length; i++) {
+      let objectXML = elements[i];
+      let word = objectXML.getAttribute("word");
+      let definition= objectXML.getAttribute("definition");
+      synonymObjects[word] = AdvSynonym(word, definition)
+   }
+   return synonymObjects;
 }
 
 /*
