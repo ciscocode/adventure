@@ -15,6 +15,7 @@
  * in the index.html file.
  */
 
+ //this function distributes objects/items into their respective rooms in the game
 function distributeObjects(objects,rooms) {
    //use a for loop.. loop through the objects
    //first read the post it and the location name
@@ -29,12 +30,9 @@ function distributeObjects(objects,rooms) {
       let locationsOfObjects = arrayOfObjects[i].getLocation() //this takes the location from an object at an index
       for (let j=0; j<arrayOfRoomNames.length; j++) {
          let nameOfRoom = arrayOfRoomNames[j]
-         //console.log(rooms.nameOfRoom)
 
          if (locationsOfObjects === nameOfRoom) {
-            //let test = rooms.nameOfRoom
             arrayOfRoomObjects[j].addObject(arrayOfObjects[i])
-            //rooms.nameOfRoom.addObject(arrayOfObjects[i])
          }
       }
    }   
@@ -60,27 +58,52 @@ function AdvGame() {
       }
       currentRoom.setVisited(true) //set flag as true. after visiting the room tell the room it has been visited. If not, it will always print the long description.  
       currentRoom.describeObjects()
-      console.requestInput("> ", checkAnswer);
-      
+      console.requestInput("> ", checkAnswer); 
    }
    
+   //this function checks the line the user inputs.
    function checkAnswer(line) {
-      //console.log('checking answer');
-      //console.log(currentRoom); erase unless you need it later!!
-
-      //let actionVerbs = ["quit","help","look"]
-      //console.log("this is line " + line)
-      //console.log("this is currentRoom " + currentRoom)
-
+      
+      let actionVerbs = ["quit","help","look"] //this is a list of actionverbs
+      let actionVerbBoolean = false // begin as false. if we happen to identify a word as an actionVerb then we can make this true
+      
+      //the following 3 lines are to ensure that the users input is subdivided into seperate words and that the first word is checked to be an action verb
+      line = line.split(" ")
+      line = line[0]
       line = line.toLowerCase()
 
+      //run this look to check if the word you used is in fact an action word
+      for (let i=0; i<actionVerbs.length; i++) {
+        
+         if (actionVerbs[i] === line) {
+            actionWordCommands(line)
+            actionVerbBoolean = true //turns boolean true if an action verb is used
+         }
+      }
+
+      //if its not an action word then we can assume the word is a direction that leads us into a new room
+      if (actionVerbBoolean === false) {
+         let roomName = currentRoom.getName(line);
+         if (roomName === undefined) {
+             console.log("I don't understand that response.");
+          } else {
+             currentRoom = rooms[roomName];
+          }
+          describeRoom();  
+      }
+   }
+
+   //this function contains the commands that are run if a specific action word is typed in by the user
+   function actionWordCommands(line) {
       switch (line) {
          case "look":
             currentRoom.printLongDescription();
+            console.requestInput("> ", checkAnswer);
             break;
    
          case "help":
             printHelp();
+            console.requestInput("> ", checkAnswer);
             break;
             
          case "quit":
@@ -88,35 +111,6 @@ function AdvGame() {
             break;
 
       }
-            let roomName = currentRoom.getName(line);
-            if (roomName === undefined) {
-                console.log("I don't understand that response.");
-             } else {
-                currentRoom = rooms[roomName];
-             }
-             describeRoom();
-   
-      
-      //old version is below
-
-      /*if (line === "look") {
-         currentRoom.printLongDescription();
-         return
-      }
-      if (line === "help") {
-         printHelp();
-         return
-      }
-      if (line === "quit") return; // do i need this?
-      
-      let roomName = currentRoom.getName(line);
-     	if (roomName === undefined) {
-         console.log("I don't understand that response.");
-      } else {
-         currentRoom = rooms[roomName];
-      }
-      describeRoom(); */
-   
    }
 	
 
