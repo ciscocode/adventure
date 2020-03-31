@@ -160,6 +160,7 @@ function AdvGame() {
    return game;
 }
 
+//this function allows you to take an object from a room and stores it inside your inventory
 function takeObject(objectInput,objects,currentRoom,inventory) {
    let arrayOfObjects = Object.values(objects)
    let arrayOfObjectNames = Object.keys(objects)
@@ -188,14 +189,14 @@ function takeObject(objectInput,objects,currentRoom,inventory) {
    }
 }
 
+//this function allows you to drop an item from your inventory into the current room the player is in
 function dropObject(objectInput,currentRoom, objects, inventory) {
    objectInput = objectInput.toUpperCase() //make sure the input is capital so that it matches the names of the objects
-   //console.log(objectInput)
    let arrayOfObjects = Object.values(objects)
    let arrayOfObjectNames = Object.keys(objects)
-   //console.log(arrayOfObjectNames)
    let indexOfObject
 
+   //this loop allows us to find the index of the object according to its name
    for (let i=0; i<arrayOfObjectNames.length; i++) {
       if (objectInput === arrayOfObjectNames[i]) {
          indexOfObject = i
@@ -204,13 +205,12 @@ function dropObject(objectInput,currentRoom, objects, inventory) {
    }
 
    let object = arrayOfObjects[indexOfObject]
-   console.log(object)
 
+   //this loop searches through the inventory to see if the object defined above is in the inventory
    for (let i=0; i<inventory.length; i++) {
       if (object === inventory[i]) {
-         console.log('hi')
          inventory.splice(i,1) //remove the object from the inventory array
-         currentRoom.addObject(object)
+         currentRoom.addObject(object) //add the object to the current room
          console.log("Dropped.")
       }
       else {
@@ -219,14 +219,16 @@ function dropObject(objectInput,currentRoom, objects, inventory) {
    }
 }
 
+//this function allows the user to print the current inventory the player is holding
 function printInventory(inventory) {
    let inventoryDescriptions = []
 
+   //this adds the description of each item to the inventory description array
    for (let i=0; i<inventory.length; i++) {
       let description = inventory[i].getDescription()
       inventoryDescriptions.push(description)
    }
-   if (inventory.length > 1) {
+   if (inventory.length > 0) {
    console.log("You are carrying:" + inventoryDescriptions)
    }
    else {
