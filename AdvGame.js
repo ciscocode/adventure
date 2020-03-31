@@ -90,6 +90,7 @@ function AdvGame() {
       switch (line) {
          case "look":
             currentRoom.printLongDescription();
+            currentRoom.describeObjects()
             console.requestInput("> ", checkAnswer);
             break;
    
@@ -100,6 +101,16 @@ function AdvGame() {
 
          case "take":
             takeObject(objectInput,objects,currentRoom,inventory)
+            console.requestInput("> ", checkAnswer);
+            break;
+
+         case "drop":
+            dropObject(objectInput,currentRoom,objects,inventory)
+            console.requestInput("> ", checkAnswer);
+            break;
+
+         case "inventory":
+            printInventory(inventory)
             console.requestInput("> ", checkAnswer);
             break;
             
@@ -149,7 +160,7 @@ function AdvGame() {
    return game;
 }
 
-function takeObject(objectInput,objects,currentRoom, inventory) {
+function takeObject(objectInput,objects,currentRoom,inventory) {
    let arrayOfObjects = Object.values(objects)
    let arrayOfObjectNames = Object.keys(objects)
 
@@ -167,12 +178,59 @@ function takeObject(objectInput,objects,currentRoom, inventory) {
    let object = arrayOfObjects[indexOfObject]
    
    if (currentRoom.contains(object)) { //if the room contains the object then remove the object from the room and place it in your inventory
-      console.log("Taken");
+      console.log("Taken.");
       currentRoom.removeObject(object) 
       inventory.push(object)
+      //console.log(inventory)
    }
    else {
-      console.log("that item is not in this room")
+      console.log("That item is not in this room.")
+   }
+}
+
+function dropObject(objectInput,currentRoom, objects, inventory) {
+   objectInput = objectInput.toUpperCase() //make sure the input is capital so that it matches the names of the objects
+   //console.log(objectInput)
+   let arrayOfObjects = Object.values(objects)
+   let arrayOfObjectNames = Object.keys(objects)
+   //console.log(arrayOfObjectNames)
+   let indexOfObject
+
+   for (let i=0; i<arrayOfObjectNames.length; i++) {
+      if (objectInput === arrayOfObjectNames[i]) {
+         indexOfObject = i
+         console.log(indexOfObject)
+      }
+   }
+
+   let object = arrayOfObjects[indexOfObject]
+   console.log(object)
+
+   for (let i=0; i<inventory.length; i++) {
+      if (object === inventory[i]) {
+         console.log('hi')
+         inventory.splice(i,1) //remove the object from the inventory array
+         currentRoom.addObject(object)
+         console.log("Dropped.")
+      }
+      else {
+         console.log("That item is not in your inventory.")
+      }
+   }
+}
+
+function printInventory(inventory) {
+   let inventoryDescriptions = []
+
+   for (let i=0; i<inventory.length; i++) {
+      let description = inventory[i].getDescription()
+      inventoryDescriptions.push(description)
+   }
+   if (inventory.length > 1) {
+   console.log("You are carrying:" + inventoryDescriptions)
+   }
+   else {
+      console.log("Your inventory is empty.")
    }
 }
 
