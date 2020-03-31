@@ -31,7 +31,6 @@ function AdvRoom(name, shortDescription, longDescription, passages) {
    let room = { };
    let objectArray = []; //this is an Array of AdvObject values
    room.objectArray = objectArray //add the array as a propery 
-   //console.log(objectArray)
 
 /*
  * Method: getName

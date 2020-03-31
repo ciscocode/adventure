@@ -24,6 +24,7 @@ function AdvGame() {
    let rooms = readRooms()
    let objects = readObjects()
    let synonyms = readSynonyms()
+   let inventory = []
 
    //distirbute objects into their respective rooms
    distributeObjects(objects,rooms)
@@ -33,6 +34,7 @@ function AdvGame() {
 
    // You write the code that initializes the state of the game
    let currentRoom = rooms["START"];
+   
       
    //this function describes a room when you visit it
 	function describeRoom() {
@@ -52,13 +54,15 @@ function AdvGame() {
    //this function checks the line the user inputs.
    function checkAnswer(line) {
       
-      let actionVerbs = ["quit","help","look"] //this is a list of actionverbs
+      let actionVerbs = ["quit","help","look","take","drop","inventory"] //this is a list of actionverbs
       let actionVerbBoolean = false // begin as false. if we happen to identify a word as an actionVerb then we can make this true
       
       line = line.toLowerCase() //made the input line lowercase
       line = line.split(" ") //if multiple words are entered split them into an array
       checkSynonyms(line) //check for synonyms first
+      objectInput = line[1] //use this for now
       line = line[0] //input the first word
+      //console.log(line)
 
       //run this look to check if the word you used is in fact an action word
       for (let i=0; i<actionVerbs.length; i++) {
@@ -93,10 +97,15 @@ function AdvGame() {
             printHelp();
             console.requestInput("> ", checkAnswer);
             break;
+
+         case "take":
+            takeObject(objectInput,objects,currentRoom,inventory)
+            console.requestInput("> ", checkAnswer);
+            break;
             
          case "quit":
             return
-            break;
+            break;    
 
       }
    }
@@ -138,6 +147,33 @@ function AdvGame() {
    };
 
    return game;
+}
+
+function takeObject(objectInput,objects,currentRoom, inventory) {
+   let arrayOfObjects = Object.values(objects)
+   let arrayOfObjectNames = Object.keys(objects)
+
+   objectInput = objectInput.toUpperCase() //turn the input into uppercase so it can match the names of the objects
+   let indexOfObject //initialize variable now
+
+   //this loop allows me to find the index of the object according to its name
+   for (let i=0; i<arrayOfObjects.length; i++) {
+      if (objectInput === arrayOfObjectNames[i]) {
+         indexOfObject = i 
+      }
+   }
+
+   //take the index and find the object
+   let object = arrayOfObjects[indexOfObject]
+   
+   if (currentRoom.contains(object)) { //if the room contains the object then remove the object from the room and place it in your inventory
+      console.log("Taken");
+      currentRoom.removeObject(object) 
+      inventory.push(object)
+   }
+   else {
+      console.log("that item is not in this room")
+   }
 }
 
 function distributeObjects(objects,rooms) {
