@@ -19,7 +19,6 @@
 
 
 function AdvGame() {
-
    //begin by reading xml/html data to create the rooms, objects, and synonyms necessary to play the game
    let rooms = readRooms()
    let objects = readObjects()
@@ -53,7 +52,7 @@ function AdvGame() {
    
    //this function checks the line the user inputs.
    function checkAnswer(line) {
-      
+
       let actionVerbs = ["quit","help","look","take","drop","inventory"] //this is a list of actionverbs
       let actionVerbBoolean = false // begin as false. if we happen to identify a word as an actionVerb then we can make this true
       
@@ -62,7 +61,6 @@ function AdvGame() {
       checkSynonyms(line) //check for synonyms first
       objectInput = line[1] //use this for now
       line = line[0] //input the first word
-      //console.log(line)
 
       //run this look to check if the word you used is in fact an action word
       for (let i=0; i<actionVerbs.length; i++) {
@@ -75,14 +73,75 @@ function AdvGame() {
 
       //if its not an action word then we can assume the word is a direction that leads us into a new room
       if (actionVerbBoolean === false) {
-         let roomName = currentRoom.getName(line);
-         if (roomName === undefined) {
-             console.log("I don't understand that response.");
-          } else {
-             currentRoom = rooms[roomName];
-          }
-          describeRoom();  
+         let passages = currentRoom.getPassages()
+         let nextRoom;
+         let key;
+
+         findPassage(line,passages,nextRoom,key,inventory) 
+         describeRoom();  
       }
+   }
+
+   function findPassage(line,passages,nextRoom,key,inventory) {
+      
+      lengthOfPassageArray = passages.length
+
+      let arrayOfMatchingDirectionPassagesIndecies = []
+      let keyArray = [] //this array will hold the keys of passages that have matching directions
+      let destinationIndex //this variable will hold the index of my destination
+      let matchingIndexOfKeyArray = null
+      
+      for (let i=0; i<lengthOfPassageArray; i++) {
+
+         //if input massages a direction in the passage array
+         if (line === passages[i].getDirection()) { 
+            destinationIndex = i            
+
+            //this array holds the possible passages. I know they are possible passages because their direction matches my input
+            arrayOfMatchingDirectionPassagesIndecies.push(i)
+
+            //very important!!! nextRoom = passages[i].getDestinationRoom() 
+            //console.log(nextRoom)
+         }
+      }
+
+      //this loop creates an array of keys for the possible passages based on the user input
+      for (let j=0; j<arrayOfMatchingDirectionPassagesIndecies.length; j++) {
+         key = passages[arrayOfMatchingDirectionPassagesIndecies[j]].getKey()
+         if (key === undefined) {
+            key = null
+         }
+          keyArray.push(key)
+      }
+
+      if (inventory.length > 0) {
+         //this loop checks my inventory. If an item in my inventory matches the key array, then I will get the index of that key array
+         for (let i=0; i<inventory.length; i++) {
+            
+            for (let j=0; j<inventory.length; j++) {
+               if (inventory[i].getName().toLowerCase() === keyArray[j]) {
+                 matchingIndexOfKeyArray = j
+               }
+            }
+         }
+      }
+
+      //I can then take the index of my key array and use it to find the passage in my array of possible matching passages
+      //I can then assign that value to my destination index
+      if (matchingIndexOfKeyArray !== null) {
+         destinationIndex = arrayOfMatchingDirectionPassagesIndecies[matchingIndexOfKeyArray]
+      }
+
+      if (passages[destinationIndex] !== undefined) {
+      nextRoom = passages[destinationIndex].getDestinationRoom()
+      }
+
+      let roomName = nextRoom
+      if (roomName === undefined) {
+          console.log("I don't understand that response.");
+       } else {
+          currentRoom = rooms[roomName];
+       }
    }
 
    //this function contains the commands that are run if a specific action word is typed in by the user
@@ -182,7 +241,6 @@ function takeObject(objectInput,objects,currentRoom,inventory) {
       console.log("Taken.");
       currentRoom.removeObject(object) 
       inventory.push(object)
-      //console.log(inventory)
    }
    else {
       console.log("That item is not in this room.")
@@ -200,7 +258,6 @@ function dropObject(objectInput,currentRoom, objects, inventory) {
    for (let i=0; i<arrayOfObjectNames.length; i++) {
       if (objectInput === arrayOfObjectNames[i]) {
          indexOfObject = i
-         console.log(indexOfObject)
       }
    }
 

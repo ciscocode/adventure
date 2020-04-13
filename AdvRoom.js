@@ -88,20 +88,12 @@ room.getName = function(name) {
  * returns the constant undefined.
  */
 
-   room.getNextRoom = function(dir) {
+   room.getPassages = function() {
       // You fill this in as part of Milestone #1
       // In Milestone #7, you will move this method to AdvGame.js and
       // replace it with a getPassages method
 
-      let passages = { };
-      let elements = dir.getElementsByTagName("passage");
-      for (let i = 0; i < elements.length; i++) {
-         let passageXML = elements[i];
-         let direction = passageXML.getAttribute("dir");
-         let nextRoom = passageXML.getAttribute("room");
-         passages[direction.toLowerCase()] = nextRoom;
-      }
-      return passages;
+      return passages
    };
 
 /*
@@ -227,33 +219,28 @@ room.getName = function(name) {
 
 function readRooms() {
    // You fill this in as part of Milestone #1
+   //each room has an array of passage objects
    let elements = document.getElementsByTagName("room");
    if (elements.length === 0) return undefined;
    let rooms = {};
    for (let i = 0; i < elements.length; i++) {
       let roomXML = elements[i];
       let name = roomXML.getAttribute("name");
-      //let room = roomXML.innerHTML; //do I need this?
       let shortDescription = roomXML.getAttribute("short");
-      let passages = readPassages(roomXML);
+      let passageElements = roomXML.getElementsByTagName("passage");
+      let passageArray = []
+      for (let i=0; i<passageElements.length; i++) {
+       let passage = readPassage(passageElements[i]);
+         passageArray.push(passage)
+      }
       let longDescription = getLongDescription(roomXML)
-      rooms[name] = AdvRoom(name, shortDescription, longDescription, passages)
+      rooms[name] = AdvRoom(name, shortDescription, longDescription, passageArray)
       if (i === 0) rooms["START"] = rooms[name];
    }
+
    return rooms;
 }
 
-function readPassages(roomXML) {
-   let passages = { };
-   let elements = roomXML.getElementsByTagName("passage");
-   for (let i = 0; i < elements.length; i++) {
-      let passageXML = elements[i];
-      let direction = passageXML.getAttribute("dir");
-      let nextRoom = passageXML.getAttribute("room");
-      passages[direction.toLowerCase()] = nextRoom;
-   }
-   return passages;
-}
 
 /*
  * Function: getLongDescription

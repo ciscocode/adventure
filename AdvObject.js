@@ -35,7 +35,7 @@ function AdvObject(name, description, location) {
  * Returns the name of this object.
  */
 
-   obj.getName = function(name) {
+   obj.getName = function() {
       // You write this method
       return name
    };
