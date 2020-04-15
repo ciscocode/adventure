@@ -24,6 +24,7 @@ function AdvGame() {
    let objects = readObjects()
    let synonyms = readSynonyms()
    let inventory = []
+   let gameStatus = "" 
 
    //distirbute objects into their respective rooms
    distributeObjects(objects,rooms)
@@ -32,12 +33,13 @@ function AdvGame() {
    if (element === null) return undefined;
 
    // You write the code that initializes the state of the game
-   let currentRoom = rooms["START"];
+   let currentRoom = rooms["OutsideBuilding"];
    
       
    //this function describes a room when you visit it
 	function describeRoom() {
 
+     
       if (currentRoom.hasBeenVisited()) { //after you visit a room once the game should only print the short description the next time you visit
          currentRoom.printShortDescription()
       }
@@ -78,6 +80,13 @@ function AdvGame() {
          let key;
 
          findPassage(line,passages,nextRoom,key,inventory) 
+
+         //if the game is over then end the function
+         if (gameStatus === "Game Over") {
+            console.log("Game Over")
+            return
+         }
+
          describeRoom();  
       }
    }
@@ -93,7 +102,7 @@ function AdvGame() {
       
       for (let i=0; i<lengthOfPassageArray; i++) {
 
-         //if input massages a direction in the passage array
+         //if input matches a direction in the passage array
          if (line === passages[i].getDirection()) { 
             destinationIndex = i            
 
@@ -141,7 +150,89 @@ function AdvGame() {
           console.log("I don't understand that response.");
        } else {
           currentRoom = rooms[roomName];
+
        }
+
+          let currentRoomPassages = currentRoom.getPassages()
+         //  console.log(currentRoomPassages)
+
+
+            //console.log('hi')
+            // console.log(currentRoom.getPassages()[i].getDirection())
+
+            //if the passage of the room is forced
+            if (currentRoomPassages[0].getDirection() === "forced") { //a forced passage will always be identified in the first index of the passage array
+               // console.log("this is a forced passage")
+               // console.log(currentRoomPassages[i].getDestinationRoom())
+
+               // line = "forced" //i am acting as if forced was the input
+               // checkAnswer(line) //call the function all over again with "forced" as my input
+               // console.log("the next line will describe room")
+               describeRoom()
+               // console.log(" ") //adds a space
+
+                   //check to see if the user is holding a key or not
+               //if the user has a key that matches with a passage then you must send that user to that specific forced passage
+
+               //TODO change to indexofforcedpassage
+               let indexOfForcedKey 
+               // console.log('before conditional begins')
+
+               //if there is only one forced passage then the index will be 0 because there is only one passage
+               if (currentRoomPassages.length === 1)  {
+                  // console.log("puppy")
+                  indexOfForcedKey = 0
+               }  
+
+               else {
+
+                  if (inventory.length > 0) {
+
+                     //this loop checks my inventory. If an item in my inventory 
+                     for (let i=0; i<inventory.length; i++) {
+                        // console.log('outer loop works')
+
+                        for (let j=0; j<currentRoomPassages.length; j++) {
+                           // console.log("inner loop is working")
+                           // console.log("A " + inventory[i].getName().toLowerCase())
+                           // console.log(currentRoomPassages)
+
+                           //passages = currentRoom.getPassages()
+                           //passages[arrayOfMatchingDirectionPassagesIndecies[j]].getKey()
+
+                           // console.log(currentRoomPassages[j])
+                           // console.log(currentRoomPassages[j].getKey())
+                           // console.log("B " + currentRoomPassages[j].getKey().toLowerCase())
+
+                           //if there is in fact a key attached to the passage
+                           if (currentRoomPassages[j].getKey() !== undefined) {
+                              // console.log("if there is a key")
+
+                              //check to see if the items in your inventory match the key
+                              if (inventory[i].getName().toLowerCase() === currentRoomPassages[j].getKey().toLowerCase()) {
+                                 // console.log("inside my if statement")
+                                 indexOfForcedKey = 0
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  //if a person doesn't have a key then the forced index is one. All forced passages with a key have an index of 0
+                  else {
+                     indexOfForcedKey = 1
+                 }
+               } 
+               // console.log("this is the index of the forced passage " + indexOfForcedKey)
+               // console.log("this is the current room " + currentRoomPassages[indexOfForcedKey].getDestinationRoom())
+
+               //if the destination of the room you are entering is called "EXIT" then you have either won or lost the game
+               if (currentRoomPassages[indexOfForcedKey].getDestinationRoom() === "EXIT") {
+                  gameStatus = "Game Over"
+                  return
+               }
+               currentRoom = rooms[currentRoomPassages[indexOfForcedKey].getDestinationRoom()]
+            }  
    }
 
    //this function contains the commands that are run if a specific action word is typed in by the user
@@ -282,14 +373,16 @@ function printInventory(inventory) {
 
    //this adds the description of each item to the inventory description array
    for (let i=0; i<inventory.length; i++) {
-      let description = inventory[i].getDescription()
+      let description = inventory[i].getDescription() 
       inventoryDescriptions.push(description)
    }
    if (inventory.length > 0) {
-   console.log("You are carrying:" + inventoryDescriptions)
-   }
+      console.log("You are carrying:" )
+      for (let i = 0; i<inventoryDescriptions.length; i++)
+         console.write(inventoryDescriptions[i] + "<br/>");
+      }
    else {
-      console.log("Your inventory is empty.")
+      console.log("You are empty-handed.")
    }
 }
 
