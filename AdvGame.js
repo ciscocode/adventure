@@ -15,9 +15,6 @@
  * in the index.html file.
  */
 
-//this function distributes objects/items into their respective rooms in the game
-
-
 function AdvGame() {
    //begin by reading xml/html data to create the rooms, objects, and synonyms necessary to play the game
    let rooms = readRooms()
@@ -26,7 +23,7 @@ function AdvGame() {
    let inventory = []
    let gameStatus = "" 
 
-   //distirbute objects into their respective rooms
+   //distribute objects into their respective rooms
    distributeObjects(objects,rooms,inventory)
 
    let element = document.getElementById("GameData");
@@ -35,76 +32,82 @@ function AdvGame() {
    // The game starts outside the building
    let currentRoom = rooms["OutsideBuilding"];
    
-   //this function describes a room when you visit it
-	function describeRoom() {
+   //this function describes a room and its objects when you visit it
+	function describeRoomAndObjects() {
      
-      //after you visit a room once the game should only print the short description the next time you visit
+      //during the first visit of a room print the long description
+      //second visit of a room - print the short description
       if (currentRoom.hasBeenVisited()) { 
          currentRoom.printShortDescription()   
-      }
-
-      else {
+      } else {
          currentRoom.printLongDescription();
       }
-      currentRoom.setVisited(true) //set flag as true. after visiting the room tell the room it has been visited. If not, it will always print the long description.  
+      //set flag as true, after visiting the room tell the room it has been visited.
+      currentRoom.setVisited(true)  
+      
+      //describe the current rooom and its objects
       currentRoom.describeObjects()
-      console.requestInput("> ", checkAnswer); 
+
+      //ask the user for another line to input
+      console.requestInput("> ", checkInput); 
    }
    
    //this function checks the line the user inputs.
-   function checkAnswer(lineInput) {
+   function checkInput(lineInput) {
 
       let actionVerbs = ["quit","help","look","take","drop","inventory","cheat"] //this is a list of actionverbs
       let actionVerbBoolean = false // begin as false. if we happen to identify a word as an actionVerb then we can make this true
       
-      lineInput = lineInput.toLowerCase() //made the input line lowercase
+      lineInput = lineInput.toLowerCase() //make input lowercase
       lineInput = lineInput.split(" ") //if multiple words are entered split them into an array
       checkSynonyms(lineInput,synonyms) //check for synonyms first
-      objectInput = lineInput[1] //use this for now
-      lineInput = lineInput[0] //input the first word
+      objectInput = lineInput[1] //the object in a command like "take water" or "drop water" will always be second in the array
+      lineInput = lineInput[0] //input the first word in the array
 
-      //run this look to check if the word you used is in fact an action word
+      //this loop checks to see if my input is an action verb
       for (let i=0; i<actionVerbs.length; i++) {
-        
          if (actionVerbs[i] === lineInput) {
             actionWordCommands(lineInput)
-            actionVerbBoolean = true //turns boolean true if an action verb is used
+            actionVerbBoolean = true 
          }
       }
 
-      //if its not an action word then we can assume the word is a direction that leads us into a new room
+      //if the input is not an action word then treat it as a direction
       if (actionVerbBoolean === false) {
          let passages = currentRoom.getPassages()
          let nextRoom;
          let key;
 
-         findPassage(lineInput,passages,nextRoom,key,inventory) 
+         //use the direction to find the passage and send the character to the next room
+         findPassageAndRoom(lineInput,passages,nextRoom,key,inventory) 
 
          //if the game is over then end the function
          if (gameStatus === "Game Over") {
             console.log("Game Over")
             return
          }
-         describeRoom();  
+
+         //otherwise describe the state of the new room and the objects within it
+         describeRoomAndObjects();  
       }
    }
 
-   function findPassage(lineInput,passages,nextRoom,key,inventory) {
+   //this function will find the correct passage for your character based on user input, and inventory
+   //it will then change the state of the current room based on the passage taken
+   function findPassageAndRoom(lineInput,passages,nextRoom,key,inventory) {
       
       lengthOfPassageArray = passages.length
 
-      let arrayOfMatchingDirectionPassagesIndecies = []
+      let arrayOfMatchingDirectionPassagesIndecies = []  //this array holds the possible passages for my character. 
       let keyArray = [] //this array will hold the keys of passages that have matching directions
       let destinationIndex //this variable will hold the index of my destination
       let matchingIndexOfKeyArray = null
       
+      //run this loop to push possible passage indecies into my array
       for (let i=0; i<lengthOfPassageArray; i++) {
-
          //if input matches a direction in the passage array
          if (lineInput === passages[i].getDirection()) { 
             destinationIndex = i            
-
-            //this array holds the possible passages. I know they are possible passages because their direction matches my input
             arrayOfMatchingDirectionPassagesIndecies.push(i)
          }
       }
@@ -121,7 +124,6 @@ function AdvGame() {
       if (inventory.length > 0) {
          //this loop checks my inventory. If an item in my inventory matches the key array, then I will get the index of that key array
          for (let i=0; i<inventory.length; i++) {
-            
             for (let j=0; j<inventory.length; j++) {
                if (inventory[i].getName().toLowerCase() === keyArray[j]) {
                  matchingIndexOfKeyArray = j
@@ -136,10 +138,13 @@ function AdvGame() {
          destinationIndex = arrayOfMatchingDirectionPassagesIndecies[matchingIndexOfKeyArray]
       }
 
+      //use my destination index to find my next room
       if (passages[destinationIndex] !== undefined) {
       nextRoom = passages[destinationIndex].getDestinationRoom()
       }
 
+      //if the room is undefined return an error message
+      //otherwise, change the value of currentRoom
       let roomName = nextRoom
       if (roomName === undefined) {
           console.log("I don't understand that response.");
@@ -159,7 +164,7 @@ function AdvGame() {
       if (currentRoomPassages[0].getDirection() === "forced") { //a forced passage will always be identified in the first index of the passage array
          
          //before entering a forced passage describe the current room you just entered 
-         describeRoom()
+         describeRoomAndObjects()
          
          let indexOfForcedPassage 
 
@@ -167,9 +172,7 @@ function AdvGame() {
          if (currentRoomPassages.length === 1)  {
             // console.log("puppy")
             indexOfForcedPassage = 0
-         }  
-
-         else {
+         }  else {
             //if I have items in my inventory
             if (inventory.length > 0) {
                
@@ -179,23 +182,20 @@ function AdvGame() {
                   //if there is in fact a key attached to the passage
                   if (currentRoomPassages[0].getKey() !== undefined) {
                         
-                     //check to see if the items in your inventory match the key
+                     //check to see if the items in your inventory match the key. if it matches the index is 0 b/c that index holds the key
+                     // if it doesnt match the index of the forced passage is 1 b/c that doesnt hold a key
                      if (inventory[j].getName().toLowerCase() === currentRoomPassages[0].getKey().toLowerCase()) {
                         indexOfForcedPassage = 0
                         break
-                     }
-                     //if it doesnt match the key then the index of the forced key is 1
-                     else {
+                     } else {
                         indexOfForcedPassage = 1
                      }
                   }
                }
-            }
-
-            //if a person doesn't have an item then the forced index is one. All forced passages with items have an index of 0
-            else {
+            } else {
+               //if a person doesn't have an item then the forced index is one. All forced passages with items have an index of 0
                indexOfForcedPassage = 1
-           } 
+            } 
          } 
          
          //if the destination of the room you are entering is called "EXIT" then you have either won or lost the game
@@ -221,33 +221,33 @@ function AdvGame() {
          case "look":
             currentRoom.printLongDescription();
             currentRoom.describeObjects()
-            console.requestInput("> ", checkAnswer);
+            console.requestInput("> ", checkInput);
             break;
    
          case "help":
             printHelp();
-            console.requestInput("> ", checkAnswer);
+            console.requestInput("> ", checkInput);
             break;
 
          case "take":
             takeObject(objectInput,objects,currentRoom,inventory)
-            console.requestInput("> ", checkAnswer);
+            console.requestInput("> ", checkInput);
             break;
 
          case "drop":
             dropObject(objectInput,currentRoom,objects,inventory)
-            console.requestInput("> ", checkAnswer);
+            console.requestInput("> ", checkInput);
             break;
 
          case "inventory":
             printInventory(inventory)
-            console.requestInput("> ", checkAnswer);
+            console.requestInput("> ", checkInput);
             break;
 
-         //this is a potentially useful feature to add all objects in the room. it is not fully worked out yet.
+         //cheat code that gives you every item. it could use more work though
          case "cheat":
             cheatCode(objects,inventory);
-            console.requestInput("> ", checkAnswer);
+            console.requestInput("> ", checkInput);
             break;
             
          case "quit":
@@ -266,7 +266,7 @@ function AdvGame() {
  */
 
    game.play = function() {
-      describeRoom()
+      describeRoomAndObjects()
    };
 
    return game;
@@ -325,8 +325,7 @@ function takeObject(objectInput,objects,currentRoom,inventory) {
       console.log("Taken.");
       currentRoom.removeObject(object) 
       inventory.push(object)
-   }
-   else {
+   } else {
       console.log("That item is not in this room.")
    }
 }
@@ -363,8 +362,7 @@ function dropObject(objectInput,currentRoom, objects, inventory) {
          inventory.splice(i,1) //remove the object from the inventory array
          currentRoom.addObject(object) //add the object to the current room
          console.log("Dropped.")
-      }
-      else {
+      } else {
          console.log("That item is not in your inventory.")
       }
    }
@@ -389,18 +387,16 @@ function printInventory(inventory) {
    }
 }
 
+//this function distributes objects into their respective rooms 
 function distributeObjects(objects,rooms,inventory) {
-   //use a for loop.. loop through the objects
-   //first read the post it and the location name
-   // then push the object into the room when location matches room name //!! PLAYER is not a room!
-
+   
    let numOfObjects = Object.keys(objects).length 
    let arrayOfObjects = Object.values(objects)
    let arrayOfRoomNames = Object.keys(rooms)
    let arrayOfRoomObjects = Object.values(rooms)
 
    for (let i=0; i<numOfObjects; i++) {
-      let locationsOfObjects = arrayOfObjects[i].getLocation() //this takes the location from an object at an index
+      let locationsOfObjects = arrayOfObjects[i].getLocation() 
 
       //first will distribute any objects belonging to the player straight into their inventory
       if (locationsOfObjects === "PLAYER") {
@@ -417,7 +413,7 @@ function distributeObjects(objects,rooms,inventory) {
    } 
 }
 
-//potential feature for future iteration of the program. not Fully coplete yet
+//potential feature for future iteration of the program. it works but could use some tweaking
 function cheatCode(objects,inventory) {
    console.log("you're cheating")
    let arrayOfObjects = Object.values(objects)

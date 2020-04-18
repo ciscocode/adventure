@@ -222,7 +222,6 @@ room.getName = function(name) {
 
 function readRooms() {
    // You fill this in as part of Milestone #1
-   //each room has an array of passage objects
    let elements = document.getElementsByTagName("room");
    if (elements.length === 0) return undefined;
    let rooms = {};
