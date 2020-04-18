@@ -62,7 +62,10 @@ room.getName = function(name) {
 
    room.printShortDescription = function() {
       // You fill this in as part of Milestone #2
-      console.write(shortDescription + "<br/>");
+      //this conditional is here to take into account the forced passages which have no short description
+      if (shortDescription !== null) {
+         console.write(shortDescription + "<br/>");
+      }
    };
 
 /*

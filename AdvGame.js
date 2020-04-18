@@ -32,16 +32,15 @@ function AdvGame() {
    let element = document.getElementById("GameData");
    if (element === null) return undefined;
 
-   // You write the code that initializes the state of the game
+   // The game starts outside the building
    let currentRoom = rooms["OutsideBuilding"];
    
-      
    //this function describes a room when you visit it
 	function describeRoom() {
-
      
-      if (currentRoom.hasBeenVisited()) { //after you visit a room once the game should only print the short description the next time you visit
-         currentRoom.printShortDescription()
+      //after you visit a room once the game should only print the short description the next time you visit
+      if (currentRoom.hasBeenVisited()) { 
+         currentRoom.printShortDescription()   
       }
 
       else {
@@ -53,22 +52,22 @@ function AdvGame() {
    }
    
    //this function checks the line the user inputs.
-   function checkAnswer(line) {
+   function checkAnswer(lineInput) {
 
       let actionVerbs = ["quit","help","look","take","drop","inventory","cheat"] //this is a list of actionverbs
       let actionVerbBoolean = false // begin as false. if we happen to identify a word as an actionVerb then we can make this true
       
-      line = line.toLowerCase() //made the input line lowercase
-      line = line.split(" ") //if multiple words are entered split them into an array
-      checkSynonyms(line) //check for synonyms first
-      objectInput = line[1] //use this for now
-      line = line[0] //input the first word
+      lineInput = lineInput.toLowerCase() //made the input line lowercase
+      lineInput = lineInput.split(" ") //if multiple words are entered split them into an array
+      checkSynonyms(lineInput,synonyms) //check for synonyms first
+      objectInput = lineInput[1] //use this for now
+      lineInput = lineInput[0] //input the first word
 
       //run this look to check if the word you used is in fact an action word
       for (let i=0; i<actionVerbs.length; i++) {
         
-         if (actionVerbs[i] === line) {
-            actionWordCommands(line)
+         if (actionVerbs[i] === lineInput) {
+            actionWordCommands(lineInput)
             actionVerbBoolean = true //turns boolean true if an action verb is used
          }
       }
@@ -79,19 +78,18 @@ function AdvGame() {
          let nextRoom;
          let key;
 
-         findPassage(line,passages,nextRoom,key,inventory) 
+         findPassage(lineInput,passages,nextRoom,key,inventory) 
 
          //if the game is over then end the function
          if (gameStatus === "Game Over") {
             console.log("Game Over")
             return
          }
-
          describeRoom();  
       }
    }
 
-   function findPassage(line,passages,nextRoom,key,inventory) {
+   function findPassage(lineInput,passages,nextRoom,key,inventory) {
       
       lengthOfPassageArray = passages.length
 
@@ -103,14 +101,11 @@ function AdvGame() {
       for (let i=0; i<lengthOfPassageArray; i++) {
 
          //if input matches a direction in the passage array
-         if (line === passages[i].getDirection()) { 
+         if (lineInput === passages[i].getDirection()) { 
             destinationIndex = i            
 
             //this array holds the possible passages. I know they are possible passages because their direction matches my input
             arrayOfMatchingDirectionPassagesIndecies.push(i)
-
-            //very important!!! nextRoom = passages[i].getDestinationRoom() 
-            //console.log(nextRoom)
          }
       }
 
@@ -150,115 +145,79 @@ function AdvGame() {
           console.log("I don't understand that response.");
        } else {
           currentRoom = rooms[roomName];
-
        }
-
-         //  console.log(currentRoomPassages)
-
-
-            //console.log('hi')
-            // console.log(currentRoom.getPassages()[i].getDirection())
-            let currentRoomPassages = currentRoom.getPassages()
-
-      forcedPassages(currentRoomPassages, inventory, rooms )
-
-            
+     
+      //after moving the player to the next room I must check for forced passages
+      let currentRoomPassages = currentRoom.getPassages()
+      forcedPassages(currentRoomPassages, inventory, rooms )         
    }
 
-   function forcedPassages(currentRoomPassages, inventory, rooms ) {
+   //this function find the possible forced passages for a room, and selects the correct passage for the player depending on whether or not the player is holding the correct key
+   function forcedPassages(currentRoomPassages, inventory, rooms) {
 
        //if the passage of the room is forced
-       if (currentRoomPassages[0].getDirection() === "forced") { //a forced passage will always be identified in the first index of the passage array
-         // console.log("this is a forced passage")
-         // console.log(currentRoomPassages[i].getDestinationRoom())
-
-         // line = "forced" //i am acting as if forced was the input
-         // checkAnswer(line) //call the function all over again with "forced" as my input
-         // console.log("the next line will describe room")
+      if (currentRoomPassages[0].getDirection() === "forced") { //a forced passage will always be identified in the first index of the passage array
+         
+         //before entering a forced passage describe the current room you just entered 
          describeRoom()
-         // console.log(" ") //adds a space
-
-             //check to see if the user is holding a key or not
-         //if the user has a key that matches with a passage then you must send that user to that specific forced passage
-
-         //TODO change to indexofforcedpassage
-         let indexOfForcedKey 
-         // console.log('before conditional begins')
+         
+         let indexOfForcedPassage 
 
          //if there is only one forced passage then the index will be 0 because there is only one passage
          if (currentRoomPassages.length === 1)  {
             // console.log("puppy")
-            indexOfForcedKey = 0
+            indexOfForcedPassage = 0
          }  
 
          else {
-
+            //if I have items in my inventory
             if (inventory.length > 0) {
-               //console.log("hi")
-
-               //this loop checks my inventory. If an item in my inventory 
-               for (let i=0; i<inventory.length; i++) {
-                   //console.log('outer loop works')
                
-
-                  for (let j=0; j<currentRoomPassages.length; j++) {
-                     //console.log("inner loop is working")
-                     // console.log("A " + inventory[i].getName().toLowerCase())
-                     // console.log(currentRoomPassages)
-
-                     //passages = currentRoom.getPassages()
-                     //passages[arrayOfMatchingDirectionPassagesIndecies[j]].getKey()
-
-                     // console.log(currentRoomPassages[j])
-                     // console.log(currentRoomPassages[j].getKey())
-                     // console.log("B " + currentRoomPassages[j].getKey().toLowerCase())
-
-                     //if there is in fact a key attached to the passage
-                     if (currentRoomPassages[j].getKey() !== undefined) {
-                        //console.log("if there is a key")
-                        // console.log(inventory[i].getName().toLowerCase())
-                        // console.log(currentRoomPassages[j].getKey().toLowerCase())
-
-                        //check to see if the items in your inventory match the key
-                        if (inventory[i].getName().toLowerCase() === currentRoomPassages[j].getKey().toLowerCase()) {
-                           //console.log("inside my if statement")
-                           indexOfForcedKey = 0
-                        }
-                        //if it doesnt match the key then the index of the forced key is 1
-                        else {
-                           indexOfForcedKey = 1
-                        }
+               //then I will loop through my inventory to see if those items match a key of a forced passage
+               for (let j=0; j<inventory.length; j++) {
+                     
+                  //if there is in fact a key attached to the passage
+                  if (currentRoomPassages[0].getKey() !== undefined) {
+                        
+                     //check to see if the items in your inventory match the key
+                     if (inventory[j].getName().toLowerCase() === currentRoomPassages[0].getKey().toLowerCase()) {
+                        indexOfForcedPassage = 0
+                        break
+                     }
+                     //if it doesnt match the key then the index of the forced key is 1
+                     else {
+                        indexOfForcedPassage = 1
                      }
                   }
                }
             }
 
-            //if a person doesn't have a key then the forced index is one. All forced passages with a key have an index of 0
+            //if a person doesn't have an item then the forced index is one. All forced passages with items have an index of 0
             else {
-               indexOfForcedKey = 1
-           }
+               indexOfForcedPassage = 1
+           } 
          } 
-         // console.log("this is the index of the forced passage " + indexOfForcedKey)
-         // console.log("this is the current room " + currentRoomPassages[indexOfForcedKey].getDestinationRoom())
-
+         
          //if the destination of the room you are entering is called "EXIT" then you have either won or lost the game
-         if (currentRoomPassages[indexOfForcedKey].getDestinationRoom() === "EXIT") {
+         if (currentRoomPassages[indexOfForcedPassage].getDestinationRoom() === "EXIT") {
             gameStatus = "Game Over"
             return
          }
-         currentRoom = rooms[currentRoomPassages[indexOfForcedKey].getDestinationRoom()]
 
+         //use the newly found index of forced passage to change the value of your current room
+         currentRoom = rooms[currentRoomPassages[indexOfForcedPassage].getDestinationRoom()]
+
+         //if your forced passage leads you to a room with another forced passage, then you can run the function again
          if (currentRoom.getPassages()[0].getDirection() === "forced") {
             currentRoomPassages = currentRoom.getPassages()
-            forcedPassages(currentRoomPassages, inventory, rooms )
+            forcedPassages(currentRoomPassages, inventory, rooms)
          } 
-
       } 
    }
 
    //this function contains the commands that are run if a specific action word is typed in by the user
-   function actionWordCommands(line) {
-      switch (line) {
+   function actionWordCommands(lineInput) {
+      switch (lineInput) {
          case "look":
             currentRoom.printLongDescription();
             currentRoom.describeObjects()
@@ -285,6 +244,7 @@ function AdvGame() {
             console.requestInput("> ", checkAnswer);
             break;
 
+         //this is a potentially useful feature to add all objects in the room. it is not fully worked out yet.
          case "cheat":
             cheatCode(objects,inventory);
             console.requestInput("> ", checkAnswer);
@@ -292,36 +252,12 @@ function AdvGame() {
             
          case "quit":
             return
-            break;    
-
-      }
-   }
-
-   //this functions checks your input to see if it has a synonym. if there is a synonym it replaces your input with the definition
-   function checkSynonyms(line) {
-      let arrayOfSynonyms = Object.keys(synonyms)
-      let arrayOfSynonymsLowerCase = []
-      let arrayOfSynonymObjects = Object.values(synonyms)
-
-      //this loop creates an array that has the synonyms in lower case
-      for (let i=0; i<arrayOfSynonyms.length; i++) {
-        arrayOfSynonymsLowerCase[i] = arrayOfSynonyms[i].toLowerCase()
-      }
-
-      //this loop checks every word input in the line to see if it is a synonym
-      for (let i=0; i<line.length; i++) {
-         for (let j=0; j<arrayOfSynonyms.length; j++) {
-            if (line[i] === arrayOfSynonymsLowerCase[j]) { // if the a word in the input matches a synonym
-               line[i] = arrayOfSynonymObjects[j].getDefinition() // then replace the value of the input line with the definition of the synonym
-               line[i] = line[i].toLowerCase() //this brings the word back to lowercase after it has been shifted to capital with the synonym change
-            }
-         } 
+            break;   
       }
    }
 
    let game = { };
    
-
 /*
  * Method: play
  * Usage: game.play();
@@ -334,6 +270,28 @@ function AdvGame() {
    };
 
    return game;
+}
+
+  //this functions checks your input to see if it has a synonym. if there is a synonym it replaces your input with the definition
+  function checkSynonyms(lineInput,synonyms) {
+   let arrayOfSynonyms = Object.keys(synonyms)
+   let arrayOfSynonymsLowerCase = []
+   let arrayOfSynonymObjects = Object.values(synonyms)
+
+   //this loop creates an array that has the synonyms in lower case
+   for (let i=0; i<arrayOfSynonyms.length; i++) {
+     arrayOfSynonymsLowerCase[i] = arrayOfSynonyms[i].toLowerCase()
+   }
+
+   //this loop checks every word input in the line to see if it is a synonym
+   for (let i=0; i<lineInput.length; i++) {
+      for (let j=0; j<arrayOfSynonyms.length; j++) {
+         if (lineInput[i] === arrayOfSynonymsLowerCase[j]) { // if the a word in the input matches a synonym
+            lineInput[i] = arrayOfSynonymObjects[j].getDefinition() // then replace the value of the input line with the definition of the synonym
+            lineInput[i] = lineInput[i].toLowerCase() //this brings the word back to lowercase after it has been shifted to capital with the synonym change
+         }
+      } 
+   }
 }
 
 //this function allows you to take an object from a room and stores it inside your inventory
@@ -459,6 +417,7 @@ function distributeObjects(objects,rooms,inventory) {
    } 
 }
 
+//potential feature for future iteration of the program. not Fully coplete yet
 function cheatCode(objects,inventory) {
    console.log("you're cheating")
    let arrayOfObjects = Object.values(objects)
