@@ -79,8 +79,17 @@ function AdvGame() {
          let key;
 
          //use the direction to find the passage and send the character to the next room
-         findPassageAndRoom(lineInput,passages,nextRoom,key,inventory) 
+         currentRoom = findPassageAndRoom(lineInput,passages,nextRoom,key,inventory,currentRoom,rooms) 
 
+         //after moving the player to the next room I must check for forced passages
+          
+         let currentRoomPassages = currentRoom.getPassages()
+
+         //if the passage of the room is forced
+         if (currentRoomPassages[0].getDirection() === "forced") { //a forced passage will always be identified in the first index of the passage array
+            forcedPassages(currentRoomPassages, inventory, rooms)  
+         }
+          
          //if the game is over then end the function
          if (gameStatus === "Game Over") {
             console.log("Game Over")
@@ -89,80 +98,15 @@ function AdvGame() {
 
          //otherwise describe the state of the new room and the objects within it
          describeRoomAndObjects();  
+         
       }
    }
 
-   //this function will find the correct passage for your character based on user input, and inventory
-   //it will then change the state of the current room based on the passage taken
-   function findPassageAndRoom(lineInput,passages,nextRoom,key,inventory) {
-      
-      lengthOfPassageArray = passages.length
-
-      let arrayOfMatchingDirectionPassagesIndecies = []  //this array holds the possible passages for my character. 
-      let keyArray = [] //this array will hold the keys of passages that have matching directions
-      let destinationIndex //this variable will hold the index of my destination
-      let matchingIndexOfKeyArray = null
-      
-      //run this loop to push possible passage indecies into my array
-      for (let i=0; i<lengthOfPassageArray; i++) {
-         //if input matches a direction in the passage array
-         if (lineInput === passages[i].getDirection()) { 
-            destinationIndex = i            
-            arrayOfMatchingDirectionPassagesIndecies.push(i)
-         }
-      }
-
-      //this loop creates an array of keys for the possible passages based on the user input
-      for (let j=0; j<arrayOfMatchingDirectionPassagesIndecies.length; j++) {
-         key = passages[arrayOfMatchingDirectionPassagesIndecies[j]].getKey()
-         if (key === undefined) {
-            key = null
-         }
-          keyArray.push(key)
-      }
-
-      if (inventory.length > 0) {
-         //this loop checks my inventory. If an item in my inventory matches the key array, then I will get the index of that key array
-         for (let i=0; i<inventory.length; i++) {
-            for (let j=0; j<inventory.length; j++) {
-               if (inventory[i].getName().toLowerCase() === keyArray[j]) {
-                 matchingIndexOfKeyArray = j
-               }
-            }
-         }
-      }
-
-      //I can then take the index of my key array and use it to find the passage in my array of possible matching passages
-      //I can then assign that value to my destination index
-      if (matchingIndexOfKeyArray !== null) {
-         destinationIndex = arrayOfMatchingDirectionPassagesIndecies[matchingIndexOfKeyArray]
-      }
-
-      //use my destination index to find my next room
-      if (passages[destinationIndex] !== undefined) {
-      nextRoom = passages[destinationIndex].getDestinationRoom()
-      }
-
-      //if the room is undefined return an error message
-      //otherwise, change the value of currentRoom
-      let roomName = nextRoom
-      if (roomName === undefined) {
-          console.log("I don't understand that response.");
-       } else {
-          currentRoom = rooms[roomName];
-       }
-     
-      //after moving the player to the next room I must check for forced passages
-      let currentRoomPassages = currentRoom.getPassages()
-      forcedPassages(currentRoomPassages, inventory, rooms )         
-   }
+   
 
    //this function find the possible forced passages for a room, and selects the correct passage for the player depending on whether or not the player is holding the correct key
    function forcedPassages(currentRoomPassages, inventory, rooms) {
 
-       //if the passage of the room is forced
-      if (currentRoomPassages[0].getDirection() === "forced") { //a forced passage will always be identified in the first index of the passage array
-         
          //before entering a forced passage describe the current room you just entered 
          describeRoomAndObjects()
          
@@ -212,7 +156,7 @@ function AdvGame() {
             currentRoomPassages = currentRoom.getPassages()
             forcedPassages(currentRoomPassages, inventory, rooms)
          } 
-      } 
+
    }
 
    //this function contains the commands that are run if a specific action word is typed in by the user
@@ -271,6 +215,70 @@ function AdvGame() {
 
    return game;
 }
+
+//this function will find the correct passage for your character based on user input, and inventory
+   //it will then change the state of the current room based on the passage taken
+   function findPassageAndRoom(lineInput,passages,nextRoom,key,inventory,currentRoom,rooms) {
+      
+      lengthOfPassageArray = passages.length
+
+      let oldRoom = currentRoom //this variable will be returned in the event that the user inputs an incorrect direction. I want to be able to return what the old room was
+      let arrayOfMatchingDirectionPassagesIndecies = []  //this array holds the possible passages for my character. 
+      let keyArray = [] //this array will hold the keys of passages that have matching directions
+      let destinationIndex //this variable will hold the index of my destination
+      let matchingIndexOfKeyArray = null
+      
+      //run this loop to push possible passage indecies into my array
+      for (let i=0; i<lengthOfPassageArray; i++) {
+         //if input matches a direction in the passage array
+         if (lineInput === passages[i].getDirection()) { 
+            destinationIndex = i            
+            arrayOfMatchingDirectionPassagesIndecies.push(i)
+         }
+      }
+
+      //this loop creates an array of keys for the possible passages based on the user input
+      for (let j=0; j<arrayOfMatchingDirectionPassagesIndecies.length; j++) {
+         key = passages[arrayOfMatchingDirectionPassagesIndecies[j]].getKey()
+         if (key === undefined) {
+            key = null
+         }
+          keyArray.push(key)
+      }
+
+      if (inventory.length > 0) {
+         //this loop checks my inventory. If an item in my inventory matches the key array, then I will get the index of that key array
+         for (let i=0; i<inventory.length; i++) {
+            for (let j=0; j<inventory.length; j++) {
+               if (inventory[i].getName().toLowerCase() === keyArray[j]) {
+                 matchingIndexOfKeyArray = j
+               }
+            }
+         }
+      }
+
+      //I can then take the index of my key array and use it to find the passage in my array of possible matching passages
+      //I can then assign that value to my destination index
+      if (matchingIndexOfKeyArray !== null) {
+         destinationIndex = arrayOfMatchingDirectionPassagesIndecies[matchingIndexOfKeyArray]
+      }
+
+      //use my destination index to find my next room
+      if (passages[destinationIndex] !== undefined) {
+      nextRoom = passages[destinationIndex].getDestinationRoom()
+      }
+
+      //if the room is undefined return an error message and stay in the oldRoom
+      //otherwise, change the value of currentRoom
+      let roomName = nextRoom
+      if (roomName === undefined) {
+         console.log("I don't understand that response.");
+         return currentRoom = oldRoom
+       } else {
+         return currentRoom = rooms[roomName];
+       }
+             
+   }
 
   //this functions checks your input to see if it has a synonym. if there is a synonym it replaces your input with the definition
   function checkSynonyms(lineInput,synonyms) {
