@@ -7,6 +7,33 @@
  * the assignment handout.
  */
 
+ /*
+ * This constant defines the instructions for the adventure game so that
+ * you don't have to retype it.  Make sure that you add additional lines
+ * to HELP_TEXT to describe any extensions you've added for the contest.
+ */
+
+const HELP_TEXT = [
+   "Welcome to Adventure!",
+   "Somewhere nearby is Colossal Cave, where others have found fortunes in",
+   "treasure and gold, though it is rumored that some who enter are never",
+   "seen again.  Magic is said to work in the cave.  I will be your eyes",
+   "and hands.  Direct me with natural English commands; I don't understand",
+   "all of the English language, but I do a pretty good job.",
+   "",
+   "It's important to remember that cave passages turn a lot, and that",
+   "leaving a room to the north does not guarantee entering the next from",
+   "the south, although it often works out that way.  You'd best make",
+   "yourself a map as you go along.",
+   "",
+   "Much of my vocabulary describes places and is used to move you there.",
+   "To move, try words like IN, OUT, EAST, WEST, NORTH, SOUTH, UP, or DOWN.",
+   "I also know about a number of objects hidden within the cave which you",
+   "can TAKE or DROP.  To see what objects you're carrying, say INVENTORY.",
+   "To reprint the detailed description of where you are, say LOOK.  If you",
+   "want to end your adventure, say QUIT."
+];
+
 /*
  * Factory method: AdvGame
  * Usage: let game = AdvGame();
@@ -21,7 +48,6 @@ function AdvGame() {
    let objects = readObjects()
    let synonyms = readSynonyms()
    let inventory = []
-   let gameStatus = "" 
 
    //distribute objects into their respective rooms
    distributeObjects(objects,rooms,inventory)
@@ -33,8 +59,8 @@ function AdvGame() {
    let currentRoom = rooms["OutsideBuilding"];
    
    //this function describes a room and its objects when you visit it
-	function describeRoomAndObjects() {
-     
+	function describeRoomAndObjects(currentRoom) {
+
       //during the first visit of a room print the long description
       //second visit of a room - print the short description
       if (currentRoom.hasBeenVisited()) { 
@@ -78,85 +104,18 @@ function AdvGame() {
          let nextRoom;
          let key;
 
-         //use the direction to find the passage and send the character to the next room
-         currentRoom = findPassageAndRoom(lineInput,passages,nextRoom,key,inventory,currentRoom,rooms) 
+         //use the input/direction to find the passage and send the character to the next room
+         currentRoom = findPassageAndRoom(lineInput,passages,nextRoom,key,inventory,currentRoom,rooms,describeRoomAndObjects) 
 
-         //after moving the player to the next room I must check for forced passages
-          
-         let currentRoomPassages = currentRoom.getPassages()
-
-         //if the passage of the room is forced
-         if (currentRoomPassages[0].getDirection() === "forced") { //a forced passage will always be identified in the first index of the passage array
-            forcedPassages(currentRoomPassages, inventory, rooms)  
-         }
-          
-         //if the game is over then end the function
-         if (gameStatus === "Game Over") {
-            console.log("Game Over")
+         //if the game is over then call my endgame function. 
+         if (currentRoom === "Game Over") {
+            console.requestInput("> ", endGame)
             return
          }
 
          //otherwise describe the state of the new room and the objects within it
-         describeRoomAndObjects();  
-         
+         describeRoomAndObjects(currentRoom);    
       }
-   }
-
-   
-
-   //this function find the possible forced passages for a room, and selects the correct passage for the player depending on whether or not the player is holding the correct key
-   function forcedPassages(currentRoomPassages, inventory, rooms) {
-
-         //before entering a forced passage describe the current room you just entered 
-         describeRoomAndObjects()
-         
-         let indexOfForcedPassage 
-
-         //if there is only one forced passage then the index will be 0 because there is only one passage
-         if (currentRoomPassages.length === 1)  {
-            // console.log("puppy")
-            indexOfForcedPassage = 0
-         }  else {
-            //if I have items in my inventory
-            if (inventory.length > 0) {
-               
-               //then I will loop through my inventory to see if those items match a key of a forced passage
-               for (let j=0; j<inventory.length; j++) {
-                     
-                  //if there is in fact a key attached to the passage
-                  if (currentRoomPassages[0].getKey() !== undefined) {
-                        
-                     //check to see if the items in your inventory match the key. if it matches the index is 0 b/c that index holds the key
-                     // if it doesnt match the index of the forced passage is 1 b/c that doesnt hold a key
-                     if (inventory[j].getName().toLowerCase() === currentRoomPassages[0].getKey().toLowerCase()) {
-                        indexOfForcedPassage = 0
-                        break
-                     } else {
-                        indexOfForcedPassage = 1
-                     }
-                  }
-               }
-            } else {
-               //if a person doesn't have an item then the forced index is one. All forced passages with items have an index of 0
-               indexOfForcedPassage = 1
-            } 
-         } 
-         
-         //if the destination of the room you are entering is called "EXIT" then you have either won or lost the game
-         if (currentRoomPassages[indexOfForcedPassage].getDestinationRoom() === "EXIT") {
-            gameStatus = "Game Over"
-            return
-         }
-
-         //use the newly found index of forced passage to change the value of your current room
-         currentRoom = rooms[currentRoomPassages[indexOfForcedPassage].getDestinationRoom()]
-
-         //if your forced passage leads you to a room with another forced passage, then you can run the function again
-         if (currentRoom.getPassages()[0].getDirection() === "forced") {
-            currentRoomPassages = currentRoom.getPassages()
-            forcedPassages(currentRoomPassages, inventory, rooms)
-         } 
-
    }
 
    //this function contains the commands that are run if a specific action word is typed in by the user
@@ -188,13 +147,15 @@ function AdvGame() {
             console.requestInput("> ", checkInput);
             break;
 
-         //cheat code that gives you every item. it could use more work though
+         //cheat code that gives you every item. it could use more work though 
+         //b/c it doesnt take into account that object have already been distributed into rooms
          case "cheat":
             cheatCode(objects,inventory);
             console.requestInput("> ", checkInput);
             break;
             
          case "quit":
+            console.requestInput("> ", endGame)
             return
             break;   
       }
@@ -210,96 +171,146 @@ function AdvGame() {
  */
 
    game.play = function() {
-      describeRoomAndObjects()
+      describeRoomAndObjects(currentRoom)
    };
-
    return game;
 }
 
-//this function will find the correct passage for your character based on user input, and inventory
-   //it will then change the state of the current room based on the passage taken
-   function findPassageAndRoom(lineInput,passages,nextRoom,key,inventory,currentRoom,rooms) {
-      
-      lengthOfPassageArray = passages.length
+//this functin simply prints out a replay message if you lose
+function endGame() {
+   console.log("Refresh to play again!" )
+   return
+}
 
-      let oldRoom = currentRoom //this variable will be returned in the event that the user inputs an incorrect direction. I want to be able to return what the old room was
-      let arrayOfMatchingDirectionPassagesIndecies = []  //this array holds the possible passages for my character. 
-      let keyArray = [] //this array will hold the keys of passages that have matching directions
-      let destinationIndex //this variable will hold the index of my destination
-      let matchingIndexOfKeyArray = null
-      
-      //run this loop to push possible passage indecies into my array
-      for (let i=0; i<lengthOfPassageArray; i++) {
-         //if input matches a direction in the passage array
-         if (lineInput === passages[i].getDirection()) { 
-            destinationIndex = i            
-            arrayOfMatchingDirectionPassagesIndecies.push(i)
-         }
-      }
+//this function find the possible forced passages for a room, and selects the correct passage for the player depending on whether or not the player is holding the correct key
+function forcedPassages(currentRoomPassages,inventory,rooms) {
+   //let oldRoom = currentRoom
+   let indexOfForcedPassage 
 
-      //this loop creates an array of keys for the possible passages based on the user input
-      for (let j=0; j<arrayOfMatchingDirectionPassagesIndecies.length; j++) {
-         key = passages[arrayOfMatchingDirectionPassagesIndecies[j]].getKey()
-         if (key === undefined) {
-            key = null
-         }
-          keyArray.push(key)
-      }
-
+   //if there is only one forced passage then the index will be 0 because there is only one passage
+   if (currentRoomPassages.length === 1)  {
+      // console.log("puppy")
+      indexOfForcedPassage = 0
+   }  else {
+      //if I have items in my inventory
       if (inventory.length > 0) {
-         //this loop checks my inventory. If an item in my inventory matches the key array, then I will get the index of that key array
-         for (let i=0; i<inventory.length; i++) {
-            for (let j=0; j<inventory.length; j++) {
-               if (inventory[i].getName().toLowerCase() === keyArray[j]) {
-                 matchingIndexOfKeyArray = j
+         
+         //then I will loop through my inventory to see if those items match a key of a forced passage
+         for (let j=0; j<inventory.length; j++) {
+               
+            //if there is in fact a key attached to the passage
+            if (currentRoomPassages[0].getKey() !== undefined) {
+                  
+               //check to see if the items in your inventory match the key. if it matches the index is 0 b/c that index holds the key
+               // if it doesnt match the index of the forced passage is 1 b/c that doesnt hold a key
+               if (inventory[j].getName().toLowerCase() === currentRoomPassages[0].getKey().toLowerCase()) {
+                  indexOfForcedPassage = 0
+                  break
+               } else {
+                  indexOfForcedPassage = 1
                }
             }
          }
-      }
-
-      //I can then take the index of my key array and use it to find the passage in my array of possible matching passages
-      //I can then assign that value to my destination index
-      if (matchingIndexOfKeyArray !== null) {
-         destinationIndex = arrayOfMatchingDirectionPassagesIndecies[matchingIndexOfKeyArray]
-      }
-
-      //use my destination index to find my next room
-      if (passages[destinationIndex] !== undefined) {
-      nextRoom = passages[destinationIndex].getDestinationRoom()
-      }
-
-      //if the room is undefined return an error message and stay in the oldRoom
-      //otherwise, change the value of currentRoom
-      let roomName = nextRoom
-      if (roomName === undefined) {
-         console.log("I don't understand that response.");
-         return currentRoom = oldRoom
-       } else {
-         return currentRoom = rooms[roomName];
-       }
-             
-   }
-
-  //this functions checks your input to see if it has a synonym. if there is a synonym it replaces your input with the definition
-  function checkSynonyms(lineInput,synonyms) {
-   let arrayOfSynonyms = Object.keys(synonyms)
-   let arrayOfSynonymsLowerCase = []
-   let arrayOfSynonymObjects = Object.values(synonyms)
-
-   //this loop creates an array that has the synonyms in lower case
-   for (let i=0; i<arrayOfSynonyms.length; i++) {
-     arrayOfSynonymsLowerCase[i] = arrayOfSynonyms[i].toLowerCase()
-   }
-
-   //this loop checks every word input in the line to see if it is a synonym
-   for (let i=0; i<lineInput.length; i++) {
-      for (let j=0; j<arrayOfSynonyms.length; j++) {
-         if (lineInput[i] === arrayOfSynonymsLowerCase[j]) { // if the a word in the input matches a synonym
-            lineInput[i] = arrayOfSynonymObjects[j].getDefinition() // then replace the value of the input line with the definition of the synonym
-            lineInput[i] = lineInput[i].toLowerCase() //this brings the word back to lowercase after it has been shifted to capital with the synonym change
-         }
+      } else {
+         //if a person doesn't have an item then the forced index is one. All forced passages with items have an index of 0
+         indexOfForcedPassage = 1
       } 
+   } 
+
+   //use the newly found index of forced passage to change the value of your current room
+   return currentRoom = rooms[currentRoomPassages[indexOfForcedPassage].getDestinationRoom()]
+}
+
+//this function will find the correct passage for your character based on user input, and inventory
+//it will then change the state of the current room based on the passage taken
+function findPassageAndRoom(lineInput,passages,nextRoom,key,inventory,currentRoom,rooms,describeRoomAndObjects) {
+      
+   lengthOfPassageArray = passages.length
+
+   let oldRoom = currentRoom //this variable will be returned in the event that the user inputs an incorrect direction. I want to be able to return what the old room was
+   let arrayOfMatchingDirectionPassagesIndecies = []  //this array holds the possible passages for my character. 
+   let keyArray = [] //this array will hold the keys of passages that have matching directions
+   let destinationIndex //this variable will hold the index of my destination
+   let matchingIndexOfKeyArray = null
+      
+   //run this loop to push possible passage indecies into my array
+   for (let i=0; i<lengthOfPassageArray; i++) {
+      //if input matches a direction in the passage array
+      if (lineInput === passages[i].getDirection()) { 
+         destinationIndex = i            
+         arrayOfMatchingDirectionPassagesIndecies.push(i)
+      }
    }
+
+   //this loop creates an array of keys for the possible passages based on the user input
+   for (let j=0; j<arrayOfMatchingDirectionPassagesIndecies.length; j++) {
+      key = passages[arrayOfMatchingDirectionPassagesIndecies[j]].getKey()
+      if (key === undefined) {
+        key = null
+      }
+      keyArray.push(key)
+   }
+
+   if (inventory.length > 0) {
+      //this loop checks my inventory. If an item in my inventory matches the key array, then I will get the index of that key array
+      for (let i=0; i<inventory.length; i++) {
+         for (let j=0; j<inventory.length; j++) {
+            if (inventory[i].getName().toLowerCase() === keyArray[j]) {
+               matchingIndexOfKeyArray = j
+            }
+         }
+      }
+   }
+
+   //I can then take the index of my key array and use it to find the passage in my array of possible matching passages
+   //I can then assign that value to my destination index
+   if (matchingIndexOfKeyArray !== null) {
+      destinationIndex = arrayOfMatchingDirectionPassagesIndecies[matchingIndexOfKeyArray]
+   }
+
+   //use my destination index to find my next room
+   if (passages[destinationIndex] !== undefined) {
+      nextRoom = passages[destinationIndex].getDestinationRoom()
+   }
+
+   //if the room is undefined return an error message and stay in the oldRoom
+   //otherwise, change the value of currentRoom
+   let roomName = nextRoom
+   if (roomName === undefined) {
+      console.log("I don't understand that response.");
+      return currentRoom = oldRoom
+      } else {
+      currentRoom = rooms[roomName]; //changes value of the current room to the new room
+         
+      //after moving the player to the next room I must check for forced passages
+      let currentRoomPassages = currentRoom.getPassages()
+      if (currentRoomPassages[0].getDirection() === "forced") { //a forced passage will always be identified in the first index of the passage array
+         describeRoomAndObjects(currentRoom); //before changing the room you must describe the current room
+
+         //this conditional takes into account the scenario if you reach a room where your character loses
+         if (currentRoom.getPassages()[0].getDestinationRoom() === "EXIT") {
+            gameStatus = "Game Over"
+            console.log(gameStatus)
+            return gameStatus
+         }
+         
+         //now you can redefine the current room based on the forced passages
+         currentRoom = forcedPassages(currentRoomPassages,inventory,rooms) 
+
+         //if your forced passage leads you to a room with another forced passage, then you can run the function again
+         //I am using a while loop because the curtain passages will continue to force you into other curtains if you are holding certain items
+         //until you finally get forced into the victory room
+         while (currentRoom.getPassages()[0].getDirection() === "forced") {
+            describeRoomAndObjects(currentRoom);    
+            currentRoomPassages = currentRoom.getPassages()
+            currentRoom = forcedPassages(currentRoomPassages,inventory,rooms)
+            if (currentRoom.getPassages()[0].getDestinationRoom() === "EXIT") {
+               break
+            }
+         } 
+      } 
+      return currentRoom
+   }        
 }
 
 //this function allows you to take an object from a room and stores it inside your inventory
@@ -363,6 +374,7 @@ function dropObject(objectInput,currentRoom, objects, inventory) {
    }
 
    let object = arrayOfObjects[indexOfObject]
+   let inventoryBoolean = false
 
    //this loop searches through the inventory to see if the object defined above is in the inventory
    for (let i=0; i<inventory.length; i++) {
@@ -370,9 +382,11 @@ function dropObject(objectInput,currentRoom, objects, inventory) {
          inventory.splice(i,1) //remove the object from the inventory array
          currentRoom.addObject(object) //add the object to the current room
          console.log("Dropped.")
-      } else {
-         console.log("That item is not in your inventory.")
-      }
+         inventoryBoolean = true
+      }    
+   }
+   if (inventoryBoolean === false) {
+      console.log("That item is not in your inventory.")
    }
 }
 
@@ -430,6 +444,28 @@ function cheatCode(objects,inventory) {
    }
 }
 
+//this functions checks your input to see if it has a synonym. if there is a synonym it replaces your input with the definition
+function checkSynonyms(lineInput,synonyms) {
+   let arrayOfSynonyms = Object.keys(synonyms)
+   let arrayOfSynonymsLowerCase = []
+   let arrayOfSynonymObjects = Object.values(synonyms)
+
+   //this loop creates an array that has the synonyms in lower case
+   for (let i=0; i<arrayOfSynonyms.length; i++) {
+     arrayOfSynonymsLowerCase[i] = arrayOfSynonyms[i].toLowerCase()
+   }
+
+   //this loop checks every word input in the line to see if it is a synonym
+   for (let i=0; i<lineInput.length; i++) {
+      for (let j=0; j<arrayOfSynonyms.length; j++) {
+         if (lineInput[i] === arrayOfSynonymsLowerCase[j]) { // if the a word in the input matches a synonym
+            lineInput[i] = arrayOfSynonymObjects[j].getDefinition() // then replace the value of the input line with the definition of the synonym
+            lineInput[i] = lineInput[i].toLowerCase() //this brings the word back to lowercase after it has been shifted to capital with the synonym change
+         }
+      } 
+   }
+}
+
 //tbis function creates a synonym object 
 function AdvSynonym(word, definition) {
    let synonymObject = { };
@@ -456,40 +492,13 @@ function readSynonyms() {
       let objectXML = elements[i];
       let word = objectXML.getAttribute("word");
       let definition= objectXML.getAttribute("definition");
-      synonymObjects[word] = AdvSynonym(word, definition)
+      synonymObjects[word] = AdvSynonym(word,definition)
    }
    return synonymObjects;
 }
 
-/*
- * This constant defines the instructions for the adventure game so that
- * you don't have to retype it.  Make sure that you add additional lines
- * to HELP_TEXT to describe any extensions you've added for the contest.
- */
-
-const HELP_TEXT = [
-   "Welcome to Adventure!",
-   "Somewhere nearby is Colossal Cave, where others have found fortunes in",
-   "treasure and gold, though it is rumored that some who enter are never",
-   "seen again.  Magic is said to work in the cave.  I will be your eyes",
-   "and hands.  Direct me with natural English commands; I don't understand",
-   "all of the English language, but I do a pretty good job.",
-   "",
-   "It's important to remember that cave passages turn a lot, and that",
-   "leaving a room to the north does not guarantee entering the next from",
-   "the south, although it often works out that way.  You'd best make",
-   "yourself a map as you go along.",
-   "",
-   "Much of my vocabulary describes places and is used to move you there.",
-   "To move, try words like IN, OUT, EAST, WEST, NORTH, SOUTH, UP, or DOWN.",
-   "I also know about a number of objects hidden within the cave which you",
-   "can TAKE or DROP.  To see what objects you're carrying, say INVENTORY.",
-   "To reprint the detailed description of where you are, say LOOK.  If you",
-   "want to end your adventure, say QUIT."
-];
-
+// this function loops so that every sentance in HELP_TEXT array is printed out neatly without commas breaking up every phrase
 function printHelp() {
-   // this function loops so that every sentance in HELP_TEXT array is printed out neatly without commas breaking up every phrase
    for (let i = 0; i<HELP_TEXT.length; i++)
       console.write(HELP_TEXT[i] + "<br/>");
 };
