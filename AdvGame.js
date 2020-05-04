@@ -189,7 +189,6 @@ function forcedPassages(currentRoomPassages,inventory,rooms) {
 
    //if there is only one forced passage then the index will be 0 because there is only one passage
    if (currentRoomPassages.length === 1)  {
-      // console.log("puppy")
       indexOfForcedPassage = 0
    }  else {
       //if I have items in my inventory
@@ -197,28 +196,36 @@ function forcedPassages(currentRoomPassages,inventory,rooms) {
          
          //then I will loop through my inventory to see if those items match a key of a forced passage
          for (let j=0; j<inventory.length; j++) {
+            let foundMatch = false
                
-            //if there is in fact a key attached to the passage
-            if (currentRoomPassages[0].getKey() !== undefined) {
-                  
-               //check to see if the items in your inventory match the key. if it matches the index is 0 b/c that index holds the key
-               // if it doesnt match the index of the forced passage is 1 b/c that doesnt hold a key
-               if (inventory[j].getName().toLowerCase() === currentRoomPassages[0].getKey().toLowerCase()) {
-                  indexOfForcedPassage = 0
-                  break
-               } else {
-                  indexOfForcedPassage = 1
-               }
-            }
+            for (let i=0; i<currentRoomPassages.length; i++) {
+   
+               if (currentRoomPassages[i].getKey() !== undefined) {
+
+                  //check to see if the items in your inventory match the key. if it matches the index is i b/c that index holds the key
+                  // if it doesnt match the index of the forced passage is the last of the current room passages
+                  if (inventory[j].getName().toLowerCase() === currentRoomPassages[i].getKey().toLowerCase()) {
+                     indexOfForcedPassage = i
+                     foundMatch = true
+                     break
+                  } else {
+                     indexOfForcedPassage = currentRoomPassages.length - 1
+                  }
+               }   
+            } 
+            if (foundMatch === true) {
+               break
+            }   
          }
       } else {
-         //if a person doesn't have an item then the forced index is one. All forced passages with items have an index of 0
-         indexOfForcedPassage = 1
+         //if a person doesn't have an item then the forced index is the last one. All forced passages without keys are last.
+         indexOfForcedPassage = currentRoomPassages.length - 1
       } 
    } 
 
    //use the newly found index of forced passage to change the value of your current room
-   return currentRoom = rooms[currentRoomPassages[indexOfForcedPassage].getDestinationRoom()]
+    currentRoom = rooms[currentRoomPassages[indexOfForcedPassage].getDestinationRoom()]
+    return currentRoom
 }
 
 //this function will find the correct passage for your character based on user input, and inventory
@@ -301,12 +308,12 @@ function findPassageAndRoom(lineInput,passages,nextRoom,key,inventory,currentRoo
          //I am using a while loop because the curtain passages will continue to force you into other curtains if you are holding certain items
          //until you finally get forced into the victory room
          while (currentRoom.getPassages()[0].getDirection() === "forced") {
-            describeRoomAndObjects(currentRoom);    
-            currentRoomPassages = currentRoom.getPassages()
-            currentRoom = forcedPassages(currentRoomPassages,inventory,rooms)
             if (currentRoom.getPassages()[0].getDestinationRoom() === "EXIT") {
                break
             }
+            describeRoomAndObjects(currentRoom);    
+            currentRoomPassages = currentRoom.getPassages()
+            currentRoom = forcedPassages(currentRoomPassages,inventory,rooms)
          } 
       } 
       return currentRoom
