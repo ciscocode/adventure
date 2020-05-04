@@ -318,7 +318,7 @@ function takeObject(objectInput,objects,currentRoom,inventory) {
    let arrayOfObjects = Object.values(objects)
    let arrayOfObjectNames = Object.keys(objects)
 
-   //if there was in face an input then you can make it capital letters
+   //if there was in fact an input then you can make it capital letters
    if (objectInput !== undefined) {
       objectInput = objectInput.toUpperCase() //turn the input into uppercase so it can match the names of the objects
    }
@@ -392,17 +392,11 @@ function dropObject(objectInput,currentRoom, objects, inventory) {
 
 //this function allows the user to print the current inventory the player is holding
 function printInventory(inventory) {
-   let inventoryDescriptions = []
-
-   //this adds the description of each item to the inventory description array
-   for (let i=0; i<inventory.length; i++) {
-      let description = inventory[i].getDescription() 
-      inventoryDescriptions.push(description)
-   }
+   
    if (inventory.length > 0) {
       console.log("You are carrying:" )
-      for (let i = 0; i<inventoryDescriptions.length; i++)
-         console.write(inventoryDescriptions[i] + "<br/>");
+      for (let i = 0; i<inventory.length; i++)
+         console.write(inventory[i].getDescription() + "<br/>");
       }
    else {
       console.log("You are empty-handed.")

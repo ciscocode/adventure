@@ -30,7 +30,7 @@ function AdvRoom(name, shortDescription, longDescription, passages) {
 
    let room = { };
    let objectArray = []; //this is an Array of AdvObject values
-   room.objectArray = objectArray //add the array as a propery 
+   room.objectArray = objectArray //add the array as a property 
 
 /*
  * Method: getName
@@ -187,11 +187,9 @@ room.getName = function(name) {
       for (let i=0; i<objectArray.length; i++) {
          if (obj === objectArray[i]) {
             return true
-         }
-         else {
-            return false
-         }
+         }  
       }
+      return false
    };
 
 /*
