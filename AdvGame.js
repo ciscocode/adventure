@@ -49,6 +49,8 @@ function AdvGame() {
    let synonyms = readSynonyms()
    let inventory = []
 
+   //console.log(objects.size)
+
    //distribute objects into their respective rooms
    distributeObjects(objects,rooms,inventory)
 
@@ -322,32 +324,23 @@ function findPassageAndRoom(lineInput,passages,nextRoom,key,inventory,currentRoo
 
 //this function allows you to take an object from a room and stores it inside your inventory
 function takeObject(objectInput,objects,currentRoom,inventory) {
-   let arrayOfObjects = Object.values(objects)
-   let arrayOfObjectNames = Object.keys(objects)
+   let object
 
-   //if there was in fact an input then you can make it capital letters
-   if (objectInput !== undefined) {
-      objectInput = objectInput.toUpperCase() //turn the input into uppercase so it can match the names of the objects
-   }
-   
-   //if there isnt an input then write an error message
-   if (objectInput === undefined) {
+    //if there isnt an input then write an error message
+    if (objectInput === undefined) {
       console.log("You didn't finish writing your sentence! What object should I take?")
       return
    }
-   let indexOfObject //initialize variable now
 
-   //this loop allows me to find the index of the object according to its name
-   for (let i=0; i<arrayOfObjects.length; i++) {
-      if (objectInput === arrayOfObjectNames[i]) {
-         indexOfObject = i 
-      }
+   //if there was in fact an input then you can make it capital letters to match the name of the objects
+   //then find your object and store it in the object variable
+   if (objectInput !== undefined) {
+      objectInput = objectInput.toUpperCase() 
+      object = objects[objectInput]
    }
-
-   //take the index and find the object
-   let object = arrayOfObjects[indexOfObject]
    
-   if (currentRoom.contains(object)) { //if the room contains the object then remove the object from the room and place it in your inventory
+   //if the room contains the object then remove the object from the room and place it in your inventory
+   if (currentRoom.contains(object)) { 
       console.log("Taken.");
       currentRoom.removeObject(object) 
       inventory.push(object)
