@@ -351,14 +351,8 @@ function takeObject(objectInput,objects,currentRoom,inventory) {
 
 //this function allows you to drop an item from your inventory into the current room the player is in
 function dropObject(objectInput,currentRoom, objects, inventory) {
-   let arrayOfObjects = Object.values(objects)
-   let arrayOfObjectNames = Object.keys(objects)
-   let indexOfObject
-
-   //if there was in face an input then you can make it capital letters
-   if (objectInput !== undefined) {
-      objectInput = objectInput.toUpperCase() //turn the input into uppercase so it can match the names of the objects
-   }
+   let object
+   let inventoryBoolean = false
 
    //if there isnt an input then write an error message
    if (objectInput === undefined) {
@@ -366,15 +360,11 @@ function dropObject(objectInput,currentRoom, objects, inventory) {
       return
    }
 
-   //this loop allows us to find the index of the object according to its name
-   for (let i=0; i<arrayOfObjectNames.length; i++) {
-      if (objectInput === arrayOfObjectNames[i]) {
-         indexOfObject = i
-      }
+   //if there was in fact an input then you can capitalize its name and assign it to the object variable
+   if (objectInput !== undefined) {
+      objectInput = objectInput.toUpperCase() 
+      object = objects[objectInput]
    }
-
-   let object = arrayOfObjects[indexOfObject]
-   let inventoryBoolean = false
 
    //this loop searches through the inventory to see if the object defined above is in the inventory
    for (let i=0; i<inventory.length; i++) {
