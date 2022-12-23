@@ -2,7 +2,7 @@
 
 # How to play
 
-Adventure is a text based game. Use the following commands to naviagte through the world, and rech the treasure!
+Adventure is a text based game. Use the following commands to naviagte through the world, and reach the treasure!
 
 | Command | Description |
 | --- | --- |
