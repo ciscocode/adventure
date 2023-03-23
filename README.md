@@ -1,8 +1,28 @@
-# adventure
+# Adventure
+
+# Project Description
+
+This program is a text-based adventure game inspited by Will Crowther's pioneering
+"Adventure" program of the early 1970s. In this game the player wanders
+around from one location to another, picking up objects, and solving simple puzzles.
+
+The program is written in Javascript and is made up of the following files:
+- Adventure.js - The main program, which gets the program started.
+- AdvPassage.js - Keeps track of the passages leading from a room.
+- AdvGame.js -Contains the code and data necessary to play the game.
+- AdvRoom.js - Maintains the data structure for each room in the cave.
+- AdvObject.js - Maintains the data structure for each object that can be carried by the player.
+
+In addition to the Javascript files above the, index.html file contains the XML data used to describe
+the attributes for each room within the game. The data is accessed through the Document Object Model (DOM)
+
+# Installation
+
+To run the game simply download the repository and open the index.html file
 
 # How to play
 
-Adventure is a text based game. Use the following commands to naviagte through the world, and reach the treasure!
+Use the following commands to navigate through the world and complete the Adventure!
 
 | Command | Description |
 | --- | --- |
